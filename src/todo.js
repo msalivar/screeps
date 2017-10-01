@@ -1,3 +1,5 @@
+check if rooms have enemy creeps and enemy structures
+mix up scout search order
 no ramparts :(
 make ramparts when within 2 spaces of walls or something
 //delete room memory if no spawn

@@ -1,13 +1,13 @@
-'using strict';
+'use strict';
 
 Creep.prototype.doBuild = function()
 {
     if(!this.memory.building) { this.memory.building = false; }
     
-    if(this.memory.building && this.carry.energy == 0) {
+    if(this.memory.building && this.carry[RESOURCE_ENERGY] == 0) {
         this.memory.building = false;
     }
-    if(!this.memory.building && this.carry.energy >= getMinimum(50, this.carryCapacity * 0.5)) {
+    if(!this.memory.building && this.carry[RESOURCE_ENERGY] >= getMinimum(50, this.carryCapacity * 0.5)) {
         this.memory.building = true;
     }
 
@@ -28,7 +28,7 @@ Creep.prototype.doBuild = function()
             }
         }
     }
-    else if (this.carry.energy < this.carryCapacity)
+    else if (this.carry[RESOURCE_ENERGY] < this.carryCapacity)
     {
         this.getEnergy();
     }

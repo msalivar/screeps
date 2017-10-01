@@ -1,4 +1,4 @@
-'using strict';
+'use strict';
 
 Creep.prototype.doRepair = function()
 {
@@ -16,11 +16,11 @@ Creep.prototype.doRepair = function()
         this.memory.target = lowestHitStructure.id;
     }
     
-    if(this.memory.repairing && this.carry.energy == 0) {
+    if(this.memory.repairing && this.carry[RESOURCE_ENERGY] == 0) {
         this.memory.repairing = false;
         this.say('🔄 harvest');
     }
-    if(!this.memory.repairing && this.carry.energy == this.carryCapacity) {
+    if(!this.memory.repairing && this.carry[RESOURCE_ENERGY] == this.carryCapacity) {
         this.memory.repairing = true;
         this.say('⚡ repair');
         
@@ -45,7 +45,7 @@ Creep.prototype.doRepair = function()
             }
         }
     }
-    else if (this.carry.energy < this.carryCapacity)
+    else if (this.carry[RESOURCE_ENERGY] < this.carryCapacity)
     {
         this.getEnergy();
     }

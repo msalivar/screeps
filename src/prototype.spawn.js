@@ -144,7 +144,7 @@ StructureSpawn.prototype.spawnCreep = function(room)
     if(room.controller.level >= 3)
     {
         if(!room.memory.scoutTick) { room.memory.scoutTick = 0; }
-        if(room.memory.scoutTick < 150) { room.memory.scoutTick++; }
+        if(room.memory.scoutTick < 300) { room.memory.scoutTick++; }
         else
         {
             room.memory.scoutTick = 0;
@@ -154,6 +154,26 @@ StructureSpawn.prototype.spawnCreep = function(room)
             {
                 this.createCreep( [ MOVE ], name, { role: 'scout' });
                 return;
+            }
+        }
+    }
+    
+    //Make long distance miners
+    if(room.controller.level >= 5 && this.room.memory.exitRooms)
+    {
+        for(let name of this.room.memory.exitRooms)
+        {
+            if(!Memory.rooms[name].hostile)
+            {
+                for(let source of Memory.rooms[name].sources)
+                {
+                    if(Memory.sources[source].harvester == 'none')
+                    {
+                        let ret = this.createLongDistanceMiner(getMaximum(room.energyCapacityAvailable * 0.4, 250), source, name);
+                        Memory.sources[source].harvester = 'long';
+                        return;
+                    }
+                }
             }
         }
     }
@@ -220,7 +240,7 @@ StructureSpawn.prototype.createGeneric = function(energy, roleName)
         mods.push(MOVE);
     }
     
-    return this.createCreep(mods, undefined, { role : roleName });
+    return this.createCreep(mods, undefined, { role: roleName });
 };
 
 StructureSpawn.prototype.createLinkUpgrader = function(energy)
@@ -233,7 +253,7 @@ StructureSpawn.prototype.createLinkUpgrader = function(energy)
     if(this.room.memory.energyConMode >= 2) { workMax += 2; }
     if(this.room.memory.energyConMode >= 3) { workMax += 3; }
     if(this.room.memory.energyConMode >= 4) { workMax += 5; }
-    if(this.room.controller.level >= 8) { workMax = 15; }
+    if(this.room.controller.level >= 8 && workMax > 15) { workMax = 15; }
     while(totalEnergy <= energy - 200 && workCount < workMax)
     {
         mods.push(WORK);
@@ -259,9 +279,26 @@ StructureSpawn.prototype.createLinkUpgrader = function(energy)
     return this.createCreep(mods, undefined, { role: 'upgrader', upgrading: false });
 };
 
-StructureSpawn.prototype.createLongDistanceMiner = function(energy)
+StructureSpawn.prototype.createLongDistanceMiner = function(energy, targetSource, targetRoom)
 {
+    let numberOfParts = getMinimum(Math.floor(energy / 250), 16);
+    let mods = [];
     
+    for(let i = 0; i < numberOfParts; i++)
+    {
+        mods.push(WORK);
+    }
+    for(let i = 0; i < numberOfParts; i++)
+    {
+        mods.push(CARRY);
+    }
+    for(let i = 0; i < numberOfParts; i++)
+    {
+        mods.push(MOVE);
+        mods.push(MOVE);
+    }
+    
+    return this.createCreep(mods, undefined, { role: 'longDistance', target: targetSource, destination: targetRoom });
 };
 
 

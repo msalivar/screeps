@@ -2,15 +2,26 @@
 
 Room.prototype.checkRoom = function()
 {
+    this.memory.hostileControlled = (this.controller && !this.controller.my);
+    
     let enemyCreeps = this.find(FIND_HOSTILE_CREEPS);
-    let enemyStructures = this.find(FIND_HOSTILE_STRUCTURES);
-    if(enemyCreeps.length && enemyStructures.length)
+    if(enemyCreeps.length)
     {
         this.memory.hostile = true;
     }
     else
     {
         this.memory.hostile = false;
+    }
+    
+    let enemyStructures = this.find(FIND_HOSTILE_STRUCTURES);
+    if(enemyStructures.length)
+    {
+        this.memory.hostileStructures = true;
+    }
+    else
+    {
+        this.memory.hostileStructures = false;
     }
     
     if (!this.memory.spawn)

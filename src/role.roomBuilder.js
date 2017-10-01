@@ -42,7 +42,7 @@ Room.prototype.tryConstruct = function()
     {
         if(this.memory.energyConMode >= 2)
         {
-            this.memory.wallHitMax = getMinimum(this.memory.wallHitMax + 300, 300000)
+            this.memory.wallHitMax = getMinimum(this.memory.wallHitMax + 300, 500000)
         }
         else
         {
@@ -140,6 +140,7 @@ Room.prototype.createStructures = function()
     if (this.controller.level >= 4)
     {
         this.createConstructionSite(spawn.pos.x, spawn.pos.y - 2, STRUCTURE_STORAGE);
+        this.createConstructionSite(spawn.pos.x, spawn.pos.y - 2, STRUCTURE_RAMPART);
     }
     if (this.controller.level >= 5)
     {

@@ -1,4 +1,4 @@
-'using strict';
+'use strict';
 
 Creep.prototype.doMine = function()
 {
@@ -23,12 +23,12 @@ Creep.prototype.doMine = function()
         }
     }
     
-    if(!this.memory.working && this.carry.energy == this.carryCapacity)
+    if(!this.memory.working && this.carry[RESOURCE_ENERGY] == this.carryCapacity)
     {
         this.memory.working = true;
         //this.say('Carrying');
     }
-    if(this.memory.working && this.carry.energy == 0)
+    if(this.memory.working && this.carry[RESOURCE_ENERGY] == 0)
     {
         this.memory.working = false;
         this.memory.target = this.findSource();

@@ -1,10 +1,10 @@
-'using strict';
+'use strict';
 
 Creep.prototype.doHaul = function()
 {
     if (this.checkRecycle()) { return; }
     
-    if(this.memory.hauling && this.carry.energy == 0)
+    if(this.memory.hauling && this.carry[RESOURCE_ENERGY] == 0)
     {
         this.memory.hauling = false;
     }
@@ -22,7 +22,6 @@ Creep.prototype.doHaul = function()
             if (this.findStorage()) { return; }
             return;
         }
-        
         
         let suppliers = this.room.find(FIND_MY_CREEPS,
         {
@@ -53,20 +52,11 @@ Creep.prototype.doHaul = function()
 
 Creep.prototype.findStorage = function(threshold)
 {
-    let storage = this.pos.findClosestByRange(FIND_MY_STRUCTURES,
-    {
-      filter: (structure) =>
-      {
-          return (structure.structureType == STRUCTURE_STORAGE) && 
-                  structure.store[RESOURCE_ENERGY] < structure.storeCapacity;
-      }
-    });
+    let storage = Game.getObjectById(this.room.memory.storage);
     if(storage)
     {
-        if(this.transfer(storage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE)
-        {
-            this.travelTo(storage);
-        }
+        this.travelTo(storage);
+        this.transfer(storage, RESOURCE_ENERGY);
         return true;
     }
     return false;

@@ -1,5 +1,3 @@
-'using strict';
-
 getContainerEnergy = function(room)
 {
     if(!room.memory.sources) { return; }
@@ -15,7 +13,7 @@ getContainerEnergy = function(room)
         }
     }
     return energyTotal;
-}
+};
 
 checkSpaceToHarvest = function(source)
 {

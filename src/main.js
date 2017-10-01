@@ -1,4 +1,4 @@
-//'use strict';
+'use strict';
 
 require('require');
 
@@ -18,8 +18,12 @@ module.exports.loop = function ()
             // If harvester died, mark its target source as unoccupied
             if(Memory.creeps[name].role == 'harvester')
             {
-                let source = Game.getObjectById(Memory.creeps[name].target);
-                source.memory.harvester = 'none';
+                Memory.sources[Memory.creeps[name].target].harvester = 'none';
+            }
+            else if(Memory.creeps[name].role == 'longDistance')
+            {
+                Memory.sources[Memory.creeps[name].target].harvester = 'none';
+                console.log('Long distance miner expired - Transferred: ' + Memory.creeps[name].transferred + ' Target: ' + Memory.creeps[name].target);
             }
             delete Memory.creeps[name];
         }

@@ -159,7 +159,7 @@ Room.prototype.doUpkeep = function()
 Room.prototype.reportControllerUpgrade = function()
 {
     if(!this.memory.controlTick) { this.memory.controlTick = 0; }
-    if(this.memory.controlTick < 200) { this.memory.controlTick++; }
+    if(this.memory.controlTick < 1000) { this.memory.controlTick++; }
     else
     {
         this.memory.controlTick = 0;
@@ -188,8 +188,6 @@ Room.prototype.findExitRooms = function()
         }
     }
 }
-
-
 
 
 

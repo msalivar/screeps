@@ -1,8 +1,8 @@
-'using strict';
+'use strict';
 
 Creep.prototype.doSupply = function()
 {
-    if(this.memory.hauling && this.carry.energy == 0)
+    if(this.memory.hauling && this.carry[RESOURCE_ENERGY] == 0)
     {
         this.memory.hauling = false;
     }

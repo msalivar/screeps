@@ -39,7 +39,7 @@ Creep.prototype.breadthFirstSearch = function()
     }
     else
     {
-        this.travelTo(new RoomPosition(25, 25, this.memory.roomTarget));
+        this.travelTo(new RoomPosition(25, 25, this.memory.roomTarget), { ignoreRoads: true});
         // if hostile run away?
     }
 }

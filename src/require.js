@@ -9,6 +9,7 @@ require('role.hauler');
 require('role.miner');
 require('role.scout');
 require('role.supplier');
+require('role.longDistance');
 require('role.roomBuilder');
 require('role.roomMemory');
 require('prototype.spawn');

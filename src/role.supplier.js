@@ -49,10 +49,8 @@ Creep.prototype.withdrawFromStorage = function()
         if(storageStructure)
         {
             if(storageStructure.store[RESOURCE_ENERGY] <= 500) { return false; }
-            if(this.withdraw(storageStructure, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE)
-            {
-                this.travelTo(storageStructure);
-            }
+            this.travelTo(storageStructure);
+            this.withdraw(storageStructure, RESOURCE_ENERGY);
             return true;
         }
     }
@@ -72,10 +70,8 @@ Creep.prototype.findSpawnOrExtension = function()
     });
     if(target)
     {
-        if(this.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE)
-        {
-            this.travelTo(target);
-        }
+        this.travelTo(target);
+        this.transfer(target, RESOURCE_ENERGY);
         return true;
     }
     return false;
@@ -93,10 +89,8 @@ Creep.prototype.findTower = function(threshold)
     });
     if(tower)
     {
-        if(this.transfer(tower, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE)
-        {
-            this.travelTo(tower);
-        }
+        this.travelTo(tower);
+        this.transfer(tower, RESOURCE_ENERGY);
         return true;
     }
     return false;
@@ -110,10 +104,8 @@ Creep.prototype.findLink = function(threshold)
     
     if (spawnLink.energy < spawnLink.energyCapacity)
     {
-        if(this.transfer(spawnLink, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE)
-        {
-            this.travelTo(spawnLink);
-        }
+        this.travelTo(spawnLink);
+        this.transfer(spawnLink, RESOURCE_ENERGY);
         return true;
     }
     return false;

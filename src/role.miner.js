@@ -26,18 +26,19 @@ Creep.prototype.doMine = function()
     if(!this.memory.working && this.carry.energy == this.carryCapacity)
     {
         this.memory.working = true;
-        this.say('Carrying');
+        //this.say('Carrying');
     }
     if(this.memory.working && this.carry.energy == 0)
     {
         this.memory.working = false;
         this.memory.target = this.findSource();
-        this.say('Mining');
+        //this.say('Mining');
     }
     
     if(!this.memory.working)
     {
         if(this.getEnergy()) { return; }
+        
         if (!this.memory.target || this.memory.target == 'error')
         {
             this.memory.target = this.findSource();
@@ -51,32 +52,6 @@ Creep.prototype.doMine = function()
     }
     else
     {
-        let targets = this.room.find(FIND_MY_STRUCTURES,
-        {
-            filter: (structure) =>
-            {
-                return (structure.structureType == STRUCTURE_SPAWN || structure.structureType == STRUCTURE_EXTENSION) &&
-                    structure.energy < structure.energyCapacity;
-            }
-        });
-        if(targets.length > 0)
-        {
-            if(this.transfer(targets[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE)
-            {
-                this.travelTo(targets[0]);
-            }
-            return;
-        }
-        else
-        {
-            let targets = this.room.find(FIND_MY_STRUCTURES,
-            {
-                filter: (structure) =>
-                {
-                    return (structure.structureType == STRUCTURE_SPAWN)
-                }
-            });
-            this.travelTo(targets[0]);
-        }
+        this.findSpawnOrExtension();
     }
 };

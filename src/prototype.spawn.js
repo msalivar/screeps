@@ -18,7 +18,7 @@ StructureSpawn.prototype.spawnCreep = function(room)
     });
     
     // Make basic miners if needed
-    if ((harvesters.length < 1) && miners.length < 2)
+    if (harvesters.length < 1 && miners.length < 2 && room.energyAvailable < 650)
     {
         this.createGeneric(250, 'miner');
         //console.log('making miner, harv: ' + harvesters.length + ' miner: ' + miners.length + ' hauler: ' + haulers.length);
@@ -143,12 +143,16 @@ StructureSpawn.prototype.spawnCreep = function(room)
     // Make scout
     if(room.controller.level >= 3)
     {
-        for(let i = 0; i < 1; i++)
+        if(!room.memory.scoutTick) { room.memory.scoutTick = 0; }
+        if(room.memory.scoutTick < 150) { room.memory.scoutTick++; }
+        else
         {
-            let name = 'scout' + i.toString();
+            room.memory.scoutTick = 0;
+            let id = Math.floor(Math.random() * 1000);
+            let name = 'scout-' + id.toString();
             if(!Game.creeps[name])
             {
-                let ret = this.createCreep( [ MOVE ], name, { role: 'scout' });
+                this.createCreep( [ MOVE ], name, { role: 'scout' });
                 return;
             }
         }
@@ -226,8 +230,9 @@ StructureSpawn.prototype.createLinkUpgrader = function(energy)
     let workCount = 0;
     let workMax = 10;
     
-    if(this.room.memory.energyConMode >= 2) { workMax += 5; }
-    if(this.room.memory.energyConMode >= 3) { workMax += 5; }
+    if(this.room.memory.energyConMode >= 2) { workMax += 2; }
+    if(this.room.memory.energyConMode >= 3) { workMax += 3; }
+    if(this.room.memory.energyConMode >= 4) { workMax += 5; }
     if(this.room.controller.level >= 8) { workMax = 15; }
     while(totalEnergy <= energy - 200 && workCount < workMax)
     {
@@ -252,6 +257,11 @@ StructureSpawn.prototype.createLinkUpgrader = function(energy)
     }
     
     return this.createCreep(mods, undefined, { role: 'upgrader', upgrading: false });
+};
+
+StructureSpawn.prototype.createLongDistanceMiner = function(energy)
+{
+    
 };
 
 

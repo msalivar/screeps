@@ -35,6 +35,10 @@ Room.prototype.runEnergyCon = function()
         let energyAmount = storage[0].store[RESOURCE_ENERGY];
         if(energyAmount >= 100000)
         {
+            this.memory.energyConMode = 5;
+        }
+        else if(energyAmount >= 70000)
+        {
             this.memory.energyConMode = 4;
         }
         else if(energyAmount >= 50000)

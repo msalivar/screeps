@@ -46,7 +46,7 @@ Room.prototype.tryConstruct = function()
         }
         else
         {
-            this.memory.wallHitMax = getMaximum(this.memory.wallHitMax - 500, 15000);
+            this.memory.wallHitMax = getMaximum(this.memory.wallHitMax - 200, 15000);
         }
         this.memory.wallHitTick = 0;
     }

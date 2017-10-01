@@ -1,0 +1,17 @@
+require('Traveler');
+require('properties');
+require('utils');
+require('role.harvester');
+require('role.upgrader');
+require('role.builder');
+require('role.repairer');
+require('role.hauler');
+require('role.miner');
+require('role.scout');
+require('role.supplier');
+require('role.roomBuilder');
+require('role.roomMemory');
+require('prototype.spawn');
+require('prototype.room');
+require('prototype.creep');
+require('prototype.tower');

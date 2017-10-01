@@ -1,0 +1,58 @@
+'using strict';
+
+Creep.prototype.doScout = function()
+{
+    this.breadthFirstSearch();
+};
+
+Creep.prototype.findRandomExit = function()
+{
+    let rooms = Game.map.describeExits(this.pos.roomName);
+    let exits = Object.keys(rooms);
+    let random = Math.floor(Math.random() * exits.length);
+    return rooms[exits[random]];
+}
+
+Creep.prototype.breadthFirstSearch = function()
+{
+    if(!this.memory.searchIndex) { this.memory.searchIndex = 0; }
+    
+    if(!this.memory.seen)
+    {
+        this.memory.seen = [this.room.name];
+    }
+    
+    if(!this.memory.search)
+    {
+        this.addExitsToSearch();
+        this.memory.roomTarget = this.memory.search[this.memory.searchIndex];
+    }
+    
+    if(this.room.name == this.memory.roomTarget)
+    {
+        this.memory.seen.push(this.room.name);
+        
+        this.addExitsToSearch();
+        
+        this.memory.searchIndex++;
+        this.memory.roomTarget = this.memory.search[this.memory.searchIndex];
+    }
+    else
+    {
+        this.travelTo(new RoomPosition(25, 25, this.memory.roomTarget));
+        // if hostile run away?
+    }
+}
+
+Creep.prototype.addExitsToSearch = function()
+{
+    if(!this.memory.search) { this.memory.search = []; }
+    let rooms = Game.map.describeExits(this.room.name);
+    for(var key in rooms)
+    {
+        if(this.memory.seen.indexOf(rooms[key]) === -1)
+        {
+            this.memory.search.push(rooms[key]);
+        }
+    }
+}

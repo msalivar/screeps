@@ -92,22 +92,23 @@ StructureSpawn.prototype.spawnCreep = function(room)
         return;
     }
     
-    // Make repairers early on
-    if (room.memory.towers.length < 1)
+    // Make repairers
+    let repairers = room.find(FIND_MY_CREEPS,
     {
-        let repairers = room.find(FIND_MY_CREEPS,
-        {
-            filter: (creep) => creep.memory.role == 'repairer'
-        });
-        let damagedStructures = room.find(FIND_STRUCTURES,
-        {
-            filter: (structure) => (structure.hits / structure.hitsMax < 0.6)
-        });
-        if (repairers.length < 1 && damagedStructures.length > 0)
-        {
-            this.createGeneric(getMaximum(250, room.energyCapacityAvailable * 1), 'repairer');
-            return;
-        }
+        filter: (creep) => creep.memory.role == 'repairer'
+    });
+    let damagedStructures = room.find(FIND_STRUCTURES,
+    {
+        filter: (structure) => (structure.structureType == STRUCTURE_RAMPART || 
+            structure.structureType == STRUCTURE_WALL) && 
+            (structure.hits < structure.hitsMax)
+    });
+    let repairerMax = 2;
+    if(this.room.memory.energyConMode >= 3) { repairerMax++; }
+    if (repairers.length < repairerMax && damagedStructures.length > 0)
+    {
+        this.createGeneric(getMaximum(200, getMinimum(room.energyCapacityAvailable * 0.2, 1000)), 'repairer');
+        return;
     }
     
     // Check upgraders
@@ -152,14 +153,14 @@ StructureSpawn.prototype.spawnCreep = function(room)
             let name = 'scout-' + id.toString();
             if(!Game.creeps[name])
             {
-                this.createCreep( [ MOVE ], name, { role: 'scout' });
+                if (this.createCreep( [ MOVE ], name, { role: 'scout' }) == OK)
                 return;
             }
         }
     }
     
     //Make long distance miners
-    if(room.controller.level >= 5 && this.room.memory.exitRooms)
+    if(room.memory.storage && Game.getObjectById(room.memory.storage))
     {
         for(let name of this.room.memory.exitRooms)
         {
@@ -169,7 +170,7 @@ StructureSpawn.prototype.spawnCreep = function(room)
                 {
                     if(Memory.sources[source].harvester == 'none')
                     {
-                        let ret = this.createLongDistanceMiner(getMaximum(room.energyCapacityAvailable * 0.4, 250), source, name);
+                        this.createLongDistanceMiner(getMaximum(room.energyCapacityAvailable * 0.4, 600), source, name);
                         Memory.sources[source].harvester = 'long';
                         return;
                     }
@@ -248,10 +249,10 @@ StructureSpawn.prototype.createLinkUpgrader = function(energy)
     let totalEnergy = 0;
     let mods = [];
     let workCount = 0;
-    let workMax = 10;
+    let workMax = 7;
     
-    if(this.room.memory.energyConMode >= 2) { workMax += 2; }
-    if(this.room.memory.energyConMode >= 3) { workMax += 3; }
+    if(this.room.memory.energyConMode >= 2) { workMax += 3; }
+    if(this.room.memory.energyConMode >= 3) { workMax += 5; }
     if(this.room.memory.energyConMode >= 4) { workMax += 5; }
     if(this.room.controller.level >= 8 && workMax > 15) { workMax = 15; }
     while(totalEnergy <= energy - 200 && workCount < workMax)
@@ -281,19 +282,25 @@ StructureSpawn.prototype.createLinkUpgrader = function(energy)
 
 StructureSpawn.prototype.createLongDistanceMiner = function(energy, targetSource, targetRoom)
 {
-    let numberOfParts = getMinimum(Math.floor(energy / 250), 16);
+    let numberOfParts = getMinimum(Math.floor(energy / 600), 16);
     let mods = [];
     
     for(let i = 0; i < numberOfParts; i++)
     {
         mods.push(WORK);
+        mods.push(WORK);
     }
     for(let i = 0; i < numberOfParts; i++)
     {
         mods.push(CARRY);
+        mods.push(CARRY);
+        mods.push(CARRY);
     }
     for(let i = 0; i < numberOfParts; i++)
     {
+        mods.push(MOVE);
+        mods.push(MOVE);
+        mods.push(MOVE);
         mods.push(MOVE);
         mods.push(MOVE);
     }

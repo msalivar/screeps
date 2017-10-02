@@ -32,36 +32,24 @@ Room.prototype.tryConstruct = function()
     }
     
     // Adjust wall hit limit
-    if(!this.memory.wallHitMax)
-    {
-        this.memory.wallHitMax = 15000;
-        this.memory.wallHitTick = 0;
-    }
-    if(this.memory.wallHitTick < 50) { this.memory.wallHitTick++; }
-    else
-    {
-        if(this.memory.energyConMode >= 2)
-        {
-            this.memory.wallHitMax = getMinimum(this.memory.wallHitMax + 300, 500000)
-        }
-        else
-        {
-            this.memory.wallHitMax = getMaximum(this.memory.wallHitMax - 200, 15000);
-        }
-        this.memory.wallHitTick = 0;
-    }
-}
-
-Room.prototype.createHarvestContainers = function()
-{
-    var sources = this.find(FIND_SOURCES);
-    for (let source of sources)
-    {
-        if (source.memory.harvestPos)
-        {
-            this.createConstructionSite(source.memory.harvestPos.x, source.memory.harvestPos.y, STRUCTURE_CONTAINER);
-        }
-    }
+    // if(!this.memory.wallHitMax)
+    // {
+    //     this.memory.wallHitMax = 15000;
+    //     this.memory.wallHitTick = 0;
+    // }
+    // if(this.memory.wallHitTick < 50) { this.memory.wallHitTick++; }
+    // else
+    // {
+    //     if(this.memory.energyConMode >= 2)
+    //     {
+    //         this.memory.wallHitMax = getMinimum(this.memory.wallHitMax + 300, 500000)
+    //     }
+    //     else
+    //     {
+    //         this.memory.wallHitMax = getMaximum(this.memory.wallHitMax - 200, 15000);
+    //     }
+    //     this.memory.wallHitTick = 0;
+    // }
 }
 
 Room.prototype.initRoads = function()
@@ -131,7 +119,6 @@ Room.prototype.createStructures = function()
     if (!spawn) { return; }
     if (this.controller.level >= 2)
     {
-        //this.createHarvestContainers();
     }
     if (this.controller.level >= 3)
     {
@@ -265,7 +252,7 @@ Room.prototype.createExtensions = function()
 
 Room.prototype.createWalls = function()
 {
-    let maxCount = 40;
+    let maxCount = 25;
     
     let count = 0;
     let nearEnd = true;
@@ -393,22 +380,28 @@ Room.prototype.buildWall = function(pos, x, y, rampart)
     newPos.y += y;
     if (checkIfBuildable(newPos))
     {
-        if(rampart)
+        if (this.createConstructionSite(newPos, STRUCTURE_RAMPART) == OK)
         {
-            if (this.createConstructionSite(newPos, STRUCTURE_RAMPART) == OK)
-            {
-                console.log('rampart: ' + pos + x + y);
-                return true;
-            }
+            console.log('rampart: ' + pos + x + y);
+            return true;
         }
-        else
-        {
-            if (this.createConstructionSite(newPos, STRUCTURE_WALL) == OK)
-            {
-                console.log('wall: ' + pos + x + y);
-                return true;
-            }
-        }
+        
+        // if(rampart)
+        // {
+        //     if (this.createConstructionSite(newPos, STRUCTURE_RAMPART) == OK)
+        //     {
+        //         console.log('rampart: ' + pos + x + y);
+        //         return true;
+        //     }
+        // }
+        // else
+        // {
+        //     if (this.createConstructionSite(newPos, STRUCTURE_WALL) == OK)
+        //     {
+        //         console.log('wall: ' + pos + x + y);
+        //         return true;
+        //     }
+        // }
     }
     return false;
 }

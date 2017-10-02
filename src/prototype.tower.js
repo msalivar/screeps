@@ -12,7 +12,7 @@ StructureTower.prototype.activate = function()
     {
         let lowStructures = this.room.find(FIND_STRUCTURES,
         {
-            filter: (structure) => (structure.hits < structure.hitsMax && structure.hits < 4000)
+            filter: (structure) => (structure.hits < structure.hitsMax && structure.hits <= 500)
         });
         if (lowStructures.length > 0)
         {
@@ -21,34 +21,34 @@ StructureTower.prototype.activate = function()
             return;
         }
     }
-    if (this.energy > this.energyCapacity * 0.6)
-    {
-        if(this.room.memory.energyConMode >= 1)
-        {
-            let damagedStructures = this.room.find(FIND_STRUCTURES,
-            {
-                filter: (structure) => (structure.hits < this.room.memory.wallHitMax) && 
-                    (structure.structureType == STRUCTURE_WALL || structure.structureType == STRUCTURE_RAMPART)
-            });
-            if (damagedStructures.length > 0)
-            {
-                let lowestHitStructure = _.min(damagedStructures, _.property('hits'));
-                this.repair(lowestHitStructure);
-                return;
-            }
-        }
+    // if (this.energy > this.energyCapacity * 0.6)
+    // {
+    //     if(this.room.memory.energyConMode >= 1)
+    //     {
+    //         let damagedStructures = this.room.find(FIND_STRUCTURES,
+    //         {
+    //             filter: (structure) => (structure.hits < this.room.memory.wallHitMax) && 
+    //                 (structure.structureType == STRUCTURE_WALL || structure.structureType == STRUCTURE_RAMPART)
+    //         });
+    //         if (damagedStructures.length > 0)
+    //         {
+    //             let lowestHitStructure = _.min(damagedStructures, _.property('hits'));
+    //             this.repair(lowestHitStructure);
+    //             return;
+    //         }
+    //     }
         
-        let walls = this.room.find(FIND_STRUCTURES,
-        {
-            filter: (structure) => (structure.hits < structure.hitsMax - 1000) && 
-                structure.structureType != STRUCTURE_WALL && 
-                structure.structureType != STRUCTURE_RAMPART
-        });
-        if (walls.length > 0)
-        {
-            let lowestHitStructure = _.min(walls, _.property('hits'));
-            this.repair(lowestHitStructure);
-            return;
-        }
-    }
+    //     let targets = this.room.find(FIND_STRUCTURES,
+    //     {
+    //         filter: (structure) => (structure.hits < structure.hitsMax - 1000) && 
+    //             structure.structureType != STRUCTURE_WALL && 
+    //             structure.structureType != STRUCTURE_RAMPART
+    //     });
+    //     if (targets.length > 0)
+    //     {
+    //         let lowestHitStructure = _.min(targets, _.property('hits'));
+    //         this.repair(lowestHitStructure);
+    //         return;
+    //     }
+    // }
 };

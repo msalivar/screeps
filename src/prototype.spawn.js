@@ -104,9 +104,10 @@ StructureSpawn.prototype.spawnCreep = function(room)
             (structure.hits < structure.hitsMax)
     });
     let repairerMax = 2;
-    if(this.room.memory.energyConMode >= 3) { repairerMax++; }
+    if(this.room.memory.energyConMode >= 3) { repairerMax += 1; }
     if (repairers.length < repairerMax && damagedStructures.length > 0)
     {
+        console.log('repairer: ' + repairers.length);
         this.createGeneric(getMaximum(200, getMinimum(room.energyCapacityAvailable * 0.2, 1000)), 'repairer');
         return;
     }
@@ -153,7 +154,7 @@ StructureSpawn.prototype.spawnCreep = function(room)
             let name = 'scout-' + id.toString();
             if(!Game.creeps[name])
             {
-                if (this.createCreep( [ MOVE ], name, { role: 'scout' }) == OK)
+                this.createCreep( [ MOVE ], name, { role: 'scout' });
                 return;
             }
         }
@@ -170,9 +171,11 @@ StructureSpawn.prototype.spawnCreep = function(room)
                 {
                     if(Memory.sources[source].harvester == 'none')
                     {
-                        this.createLongDistanceMiner(getMaximum(room.energyCapacityAvailable * 0.4, 600), source, name);
-                        Memory.sources[source].harvester = 'long';
-                        return;
+                        if(!(this.createLongDistanceMiner(getMaximum(room.energyCapacityAvailable * 0.4, 600), source, name) < 0))
+                        {
+                            Memory.sources[source].harvester = 'long';
+                            return;
+                        }
                     }
                 }
             }
@@ -305,7 +308,7 @@ StructureSpawn.prototype.createLongDistanceMiner = function(energy, targetSource
         mods.push(MOVE);
     }
     
-    return this.createCreep(mods, undefined, { role: 'longDistance', target: targetSource, destination: targetRoom });
+    return this.createCreep(mods, undefined, { role: 'longDistanceMiner', target: targetSource, destination: targetRoom });
 };
 
 

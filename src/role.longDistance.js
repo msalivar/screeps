@@ -1,6 +1,6 @@
 'use strict';
 
-Creep.prototype.doLongDistance = function()
+Creep.prototype.doLongDistanceMine = function()
 {
     if(!this.memory.homeRoom) { this.memory.homeRoom = this.room.name; }
     if(!this.memory.transferred) { this.memory.transferred = 0; }
@@ -27,6 +27,7 @@ Creep.prototype.doLongDistance = function()
             let storage = Game.getObjectById(this.room.memory.storage);
             if(storage)
             {
+                // use harvest pos
                 this.travelTo(storage);
                 if(this.transfer(storage, RESOURCE_ENERGY) == OK)
                 {
@@ -40,3 +41,16 @@ Creep.prototype.doLongDistance = function()
         }
     }
 };
+
+Creep.prototype.doLongDistanceHarvest = function()
+{
+    
+};
+
+Creep.prototype.doLongDistanceHaul = function()
+{
+    
+};
+
+
+

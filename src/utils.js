@@ -1,3 +1,24 @@
+cleanCreepMemory = function()
+{
+    for (let name in Memory.creeps)
+    {
+        if (!Game.creeps[name])
+        {
+            // If harvester died, mark its target source as unoccupied
+            if(Memory.creeps[name].role == 'harvester')
+            {
+                Memory.sources[Memory.creeps[name].target].harvester = 'none';
+            }
+            else if(Memory.creeps[name].role == 'longDistanceMiner')
+            {
+                Memory.sources[Memory.creeps[name].target].harvester = 'none';
+                console.log('Long distance miner expired - Transferred: ' + Memory.creeps[name].transferred + ' Target: ' + Memory.creeps[name].target);
+            }
+            delete Memory.creeps[name];
+        }
+    }  
+};
+
 getContainerEnergy = function(room)
 {
     if(!room.memory.sources) { return; }

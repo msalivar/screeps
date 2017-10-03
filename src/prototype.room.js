@@ -6,7 +6,7 @@ Room.prototype.run = function()
     this.doUpkeep();
     this.runEnergyCon();
     this.runDefCon();
-    this.reportControllerUpgrade();
+    //this.reportControllerUpgrade();
     this.tryConstruct();
     this.cacheRoom();
 };
@@ -91,6 +91,10 @@ Room.prototype.doUpkeep = function()
         delete this.memory.spawn;
         return;
     }
+    
+    if(this.memory.hostile)           { delete this.memory.hostile; }
+    if(this.memory.hostileControlled) { delete this.memory.hostileControlled; }
+    if(this.memory.hostileStructures) { delete this.memory.hostileStructures; }
         
     this.findExitPositions();
     this.findExitRooms();
@@ -159,7 +163,7 @@ Room.prototype.doUpkeep = function()
 Room.prototype.reportControllerUpgrade = function()
 {
     if(!this.memory.controlTick) { this.memory.controlTick = 0; }
-    if(this.memory.controlTick < 1000) { this.memory.controlTick++; }
+    if(this.memory.controlTick < 500) { this.memory.controlTick++; }
     else
     {
         this.memory.controlTick = 0;
@@ -168,7 +172,7 @@ Room.prototype.reportControllerUpgrade = function()
         else
         {
             let newDiff = progress - this.memory.controlProg;
-            let rate = newDiff / 100;
+            let rate = newDiff / 500;
             let progLeft = this.controller.progressTotal - this.controller.progress;
             console.log('Controller Upgrade - Rate: ' + rate + ' ETA: ' + progLeft / rate + ' ticks.');
         }

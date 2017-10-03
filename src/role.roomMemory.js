@@ -2,7 +2,28 @@
 
 Room.prototype.checkRoom = function()
 {
-    this.memory.hostileControlled = (this.controller && !this.controller.my);
+    if (!this.memory.spawn)
+    {
+        var spawns = this.find(FIND_MY_SPAWNS);
+        if (spawns.length) { this.memory.spawn = spawns[0].id; }
+    }
+    
+    if (!this.memory.sources)
+    {
+        this.memory.sources = [];
+        var sources = this.find(FIND_SOURCES);
+        for (let source of sources)
+        {
+            this.memory.sources.push(source.id);
+            source.memory.harvester = 'none';
+            source.memory.harvestPos = findConstructionSite(source, this.name);
+        }
+    }
+    
+    if(this.controller)
+    {
+        this.memory.hostileControlled = (this.controller.level > 0 && !this.controller.my);
+    }
     
     let enemyCreeps = this.find(FIND_HOSTILE_CREEPS);
     if(enemyCreeps.length)
@@ -22,25 +43,6 @@ Room.prototype.checkRoom = function()
     else
     {
         this.memory.hostileStructures = false;
-    }
-    
-    if (!this.memory.spawn)
-    {
-        var spawns = this.find(FIND_MY_SPAWNS);
-        if (spawns.length) { this.memory.spawn = spawns[0].id; }
-    }
-    
-    if (!this.memory.sources)
-    {
-        this.memory.sources = [];
-        var sources = this.find(FIND_SOURCES);
-        for (let source of sources)
-        {
-            this.memory.sources.push(source.id);
-            source.memory.harvester = 'none';
-            source.memory.harvestPos = findConstructionSite(source, this.name);
-        }
-        //console.log('Room ' + room.name + ' has sources: ' + room.memory.sources + '.');
     }
 };
 

@@ -61,6 +61,19 @@ Room.prototype.cacheRoom = function()
     }
 };
 
+Room.prototype.findExitRooms = function()
+{
+    if(!this.memory.exitRooms)
+    {
+        this.memory.exitRooms = [];
+        let rooms = Game.map.describeExits(this.name);
+        for(var key in rooms)
+        {
+            this.memory.exitRooms.push(rooms[key]);
+        }
+    }
+}
+
 Room.prototype.findExitPositions = function()
 {
     if(!this.memory.leftExits)

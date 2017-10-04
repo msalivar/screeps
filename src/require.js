@@ -1,3 +1,4 @@
+require('config');
 require('Traveler');
 require('properties');
 require('utils');

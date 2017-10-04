@@ -11,7 +11,7 @@ Creep.prototype.doHarvest = function()
     else
     {
         this.harvest(target);
-        if (checkIfBuildable(position))
+        if (this.room.controller.level >= 3 && checkIfBuildable(position))
         {
             this.room.createConstructionSite(position, STRUCTURE_CONTAINER);
         }

@@ -6,9 +6,10 @@ Room.prototype.run = function()
     this.doUpkeep();
     this.runEnergyCon();
     this.runDefCon();
-    //this.reportControllerUpgrade();
     this.tryConstruct();
     this.cacheRoom();
+    
+    if (global.config.options.reportControllerUpgrade) { this.reportControllerUpgrade(); }
 };
 
 Room.prototype.runDefCon = function()
@@ -79,8 +80,17 @@ Room.prototype.init = function()
             source.memory.harvester = 'none';
             source.memory.harvestPos = findConstructionSite(source, this.name);
         }
-        //console.log('Room ' + room.name + ' has sources: ' + room.memory.sources + '.');
     }
+    
+    // Check creep count memory
+    if(!this.memory.creeps) { this.memory.creeps = {}; }
+    if(!this.memory.creeps.miners) { this.memory.creeps.miners = 0; }
+    if(!this.memory.creeps.harvesters) { this.memory.creeps.harvesters = 0; }
+    if(!this.memory.creeps.haulers) { this.memory.creeps.haulers = 0; }
+    if(!this.memory.creeps.builders) { this.memory.creeps.builders = 0; }
+    if(!this.memory.creeps.repairers) { this.memory.creeps.repairers = 0; }
+    if(!this.memory.creeps.upgraders) { this.memory.creeps.upgraders = 0; }
+    if(!this.memory.creeps.suppliers) { this.memory.creeps.suppliers = 0; }
 }
 
 Room.prototype.doUpkeep = function()
@@ -114,11 +124,18 @@ Room.prototype.doUpkeep = function()
         this.memory.avgSourceRange = range / sourceCount;
     }
     
+    // Increment scout spawn timer
+    if(this.controller.level >= 3)
+    {
+        if(!this.memory.scoutTick) { this.memory.scoutTick = 0; }
+        if(this.memory.scoutTick < global.config.options.scoutTimer) { this.memory.scoutTick++; }
+    }
+    
     // Spawn creeps
     var spawns = this.find(FIND_MY_SPAWNS);
     for (let spawn of spawns)
     {
-        spawn.spawnCreep(this);
+        spawn.doSpawn(this);
     }
     
     // Operate towers
@@ -174,26 +191,11 @@ Room.prototype.reportControllerUpgrade = function()
             let newDiff = progress - this.memory.controlProg;
             let rate = newDiff / 500;
             let progLeft = this.controller.progressTotal - this.controller.progress;
-            console.log('Controller Upgrade - Rate: ' + rate + ' ETA: ' + progLeft / rate + ' ticks.');
+            console.log('Room ' + this.name + ' controller Upgrade - Rate: ' + rate + ' ETA: ' + progLeft / rate + ' ticks.');
         }
         this.memory.controlProg = progress;
     }
 }
-
-Room.prototype.findExitRooms = function()
-{
-    if(!this.memory.exitRooms)
-    {
-        this.memory.exitRooms = [];
-        let rooms = Game.map.describeExits(this.name);
-        for(var key in rooms)
-        {
-            this.memory.exitRooms.push(rooms[key]);
-        }
-    }
-}
-
-
 
 
 

@@ -4,18 +4,15 @@ require('require');
 
 module.exports.loop = function ()
 {
-    // Init stuff
-    if(!Memory.myRooms)
-    {
-        //Memory.myRooms = [];
-    }
-    
     cleanCreepMemory();
     
     // Process creeps
     for(let name in Game.creeps)
     {
         let creep = Game.creeps[name];
+        
+        if(!creep.memory.homeRoom) { creep.memory.homeRoom = creep.pos.roomName; }
+        
         if (creep.memory.role == 'harvester')                   { creep.doHarvest(); }
         else if (creep.memory.role == 'upgrader')               { creep.doUpgrade(); }
         else if (creep.memory.role == 'builder')                { creep.doBuild(); }

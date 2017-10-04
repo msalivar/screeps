@@ -8,7 +8,7 @@ Creep.prototype.doHaul = function()
     {
         this.memory.hauling = false;
     }
-    if(!this.memory.hauling && this.carry[RESOURCE_ENERGY] >= getMaximum(50, this.carryCapacity * 0.8))
+    if(!this.memory.hauling && this.carry[RESOURCE_ENERGY] >= getMaximum(50, this.carryCapacity * 0.5))
     {
         this.memory.hauling = true;
     }

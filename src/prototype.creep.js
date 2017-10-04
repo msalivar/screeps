@@ -6,7 +6,7 @@ Creep.prototype.getEnergy = function()
     {
         let source = this.pos.findClosestByRange(FIND_DROPPED_RESOURCES,
         {
-            filter: (resource) => { return resource.resourceType == RESOURCE_ENERGY && (resource.amount >= getMinimum(this.carryCapacity / 2, 100)) && resource.room.name == this.room.name }
+            filter: (resource) => { return resource.resourceType == RESOURCE_ENERGY && (resource.amount >= getMinimum(this.carryCapacity / 2, 50)) && resource.room.name == this.room.name }
         });
         if (this.room.controller.level < 4)
         {

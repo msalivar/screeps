@@ -1,18 +1,45 @@
+
+
 cleanCreepMemory = function()
 {
     for (let name in Memory.creeps)
     {
         if (!Game.creeps[name])
         {
-            // If harvester died, mark its target source as unoccupied
-            if(Memory.creeps[name].role == 'harvester')
+            switch(Memory.creeps[name].role)
             {
-                Memory.sources[Memory.creeps[name].target].harvester = 'none';
-            }
-            else if(Memory.creeps[name].role == 'longDistanceMiner')
-            {
-                Memory.sources[Memory.creeps[name].target].harvester = 'none';
-                console.log('Long distance miner expired - Transferred: ' + Memory.creeps[name].transferred + ' Target: ' + Memory.creeps[name].target);
+                case 'harvester':
+                    Memory.sources[Memory.creeps[name].target].harvester = 'none';
+                    //console.log(Memory.creeps[name].homeRoom);
+                    Game.rooms[Memory.creeps[name].homeRoom].memory.creeps.harvesters--;
+                    break;
+                case 'hauler':
+                    Game.rooms[Memory.creeps[name].homeRoom].memory.creeps.haulers--;
+                    break;
+                case 'builder':
+                    Game.rooms[Memory.creeps[name].homeRoom].memory.creeps.builders--;
+                    break;
+                case 'repairer':
+                    Game.rooms[Memory.creeps[name].homeRoom].memory.creeps.repairers--;
+                    break;
+                case 'upgrader':
+                    Game.rooms[Memory.creeps[name].homeRoom].memory.creeps.upgraders--;
+                    break;
+                case 'supplier':
+                    Game.rooms[Memory.creeps[name].homeRoom].memory.creeps.suppliers--;
+                    break;
+                case 'miner':
+                    Game.rooms[Memory.creeps[name].homeRoom].memory.creeps.miners--;
+                    break;
+                case 'longDistanceHarvester':
+                    //Memory.sources[Memory.creeps[name].target].harvester = 'none';
+                    break;
+                case 'longDistanceHauler':
+                    //Memory.sources[Memory.creeps[name].target].harvester = 'none';
+                    //console.log('Long distance hauler expired - Transferred: ' + Memory.creeps[name].transferred + ' Target: ' + Memory.creeps[name].target);
+                    break;
+                default:
+                    break;
             }
             delete Memory.creeps[name];
         }
@@ -35,6 +62,11 @@ getContainerEnergy = function(room)
     }
     return energyTotal;
 };
+
+generateRandomId = function()
+{
+    return (Math.floor(Math.random() * 10000)).toString();
+}
 
 checkSpaceToHarvest = function(source)
 {

@@ -5,14 +5,6 @@ Creep.prototype.doScout = function()
     this.breadthFirstSearch();
 };
 
-Creep.prototype.findRandomExit = function()
-{
-    let rooms = Game.map.describeExits(this.pos.roomName);
-    let exits = Object.keys(rooms);
-    let random = Math.floor(Math.random() * exits.length);
-    return rooms[exits[random]];
-}
-
 Creep.prototype.breadthFirstSearch = function()
 {
     if(!this.memory.searchIndex) { this.memory.searchIndex = 0; }
@@ -39,10 +31,18 @@ Creep.prototype.breadthFirstSearch = function()
     }
     else
     {
-        this.travelTo(new RoomPosition(25, 25, this.memory.roomTarget), { ignoreRoads: true});
+        this.travelTo(new RoomPosition(25, 25, this.memory.roomTarget), {ignoreRoads: true});
         // if hostile run away?
     }
-}
+};
+
+Creep.prototype.findRandomExit = function()
+{
+    let rooms = Game.map.describeExits(this.pos.roomName);
+    let exits = Object.keys(rooms);
+    let random = Math.floor(Math.random() * exits.length);
+    return rooms[exits[random]];
+};
 
 Creep.prototype.addExitsToSearch = function()
 {
@@ -56,4 +56,4 @@ Creep.prototype.addExitsToSearch = function()
             this.memory.search.push(rooms[key]);
         }
     }
-}
+};

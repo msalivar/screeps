@@ -16,7 +16,7 @@ Creep.prototype.doLongDistanceMine = function()
             let source = Game.getObjectById(this.memory.target);
             if(this.harvest(source) == ERR_NOT_IN_RANGE)
             {
-                this.travelTo(source);
+                this.travelTo(source, {ignoreRoads: true});
             }
         }
     }
@@ -37,7 +37,7 @@ Creep.prototype.doLongDistanceMine = function()
         }
         else
         {
-            this.travelTo(new RoomPosition(25, 25, this.memory.destination));
+            this.travelTo(new RoomPosition(25, 25, this.memory.destination), {ignoreRoads: true});
         }
     }
 };

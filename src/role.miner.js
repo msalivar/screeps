@@ -1,5 +1,3 @@
-'use strict';
-
 Creep.prototype.doMine = function()
 {
     let harvesters = this.room.find(FIND_MY_CREEPS,

@@ -15,6 +15,7 @@ Creep.prototype.doRepair = function()
         this.say('⚡ repair');
         
         this.memory.target = this.getRepairTargetId();
+        this.memory.repairCount = 0;
     }
     
     if(this.memory.repairing)
@@ -23,11 +24,23 @@ Creep.prototype.doRepair = function()
         if (!target || target.hits == target.hitsMax)
         { 
             this.memory.target = this.getRepairTargetId();
+            this.memory.repairCount = 0;
         }
     
-        if(this.repair(target) == ERR_NOT_IN_RANGE)
+        let ret = this.repair(target);
+        if(ret == ERR_NOT_IN_RANGE)
         {
             this.travelTo(target);
+        }
+        else if(ret == OK)
+        {
+            this.memory.repairCount++;
+            if(!this.memory.repairCount) { this.memory.repairCount = 0; }
+            if(this.memory.repairCount >= 25)
+            {
+                this.memory.target = this.getRepairTargetId();
+                this.memory.repairCount = 0;
+            }
         }
     }
     else if (this.carry[RESOURCE_ENERGY] < this.carryCapacity)

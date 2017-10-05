@@ -51,7 +51,7 @@ StructureSpawn.prototype.doSpawn = function(room)
     {
         haulersNeeded -= 1;
     }
-    if(getContainerEnergy(room) >= 1400 * room.memory.sources.length) { haulersNeeded++; }
+    if(this.room.memory.storage && getContainerEnergy(room) >= 1400 * room.memory.sources.length) { haulersNeeded++; }
     if(this.room.memory.creeps.haulers < haulersNeeded)
     {
         let ret = this.createHauler(getMaximum(getMinimum(room.energyCapacityAvailable * 0.6, 750), 250));
@@ -69,7 +69,8 @@ StructureSpawn.prototype.doSpawn = function(room)
         let storageStructure = Game.getObjectById(room.memory.storage);
         if(storageStructure)
         {
-            let ret = this.createCreep([CARRY, CARRY, CARRY, CARRY, MOVE, MOVE], undefined, { role: 'supplier' , hauling: false});
+            let name = 'supplier-' + generateRandomId();
+            let ret = this.spawnCreep([CARRY, CARRY, CARRY, CARRY, MOVE, MOVE], name, { memory: {role: 'supplier' , hauling: false} });
             if(ret == OK)
             {
                 this.room.memory.creeps.suppliers++;
@@ -84,11 +85,14 @@ StructureSpawn.prototype.doSpawn = function(room)
     
     // Check builders
     let sites = room.find(FIND_CONSTRUCTION_SITES);
-    if ((this.room.memory.creeps.builders < 1 && sites.length > 0)
-            || (this.room.controller.level >= 2 && this.room.memory.creeps.builders < 2 && sites.length >= 5)
-            || (this.room.controller.level >= 2 && this.room.memory.creeps.builders < 3 && sites.length >= 10 && room.memory.energyConMode >= 2))
+    let maxBuilders = 1;
+    if(getContainerEnergy(room) >= 2000 * room.memory.sources.length) { maxBuilders++; }
+    if(this.room.controller.level >= 2 && sites.length >= 5) { maxBuilders++; }
+    if(sites.length >= 10 && room.memory.energyConMode >= 2) { maxBuilders++; }
+    
+    if(sites.length > 0 && this.room.memory.creeps.builders < maxBuilders)
     {
-        let ret = this.createGeneric(getMaximum(room.energyCapacityAvailable * 0.3, 200), 'builder');
+        let ret = this.createGeneric(getMaximum(room.energyCapacityAvailable * 0.5, 200), 'builder');
         if(ret == OK)
         {
             this.room.memory.creeps.builders++;
@@ -97,7 +101,7 @@ StructureSpawn.prototype.doSpawn = function(room)
         return;
     }
     
-    // Make repairers
+    // Check repairers
     let damagedStructures = room.find(FIND_STRUCTURES,
     {
         filter: (structure) => (structure.structureType == STRUCTURE_RAMPART || 
@@ -106,9 +110,11 @@ StructureSpawn.prototype.doSpawn = function(room)
     });
     let repairerMax = 2;
     if(this.room.memory.energyConMode >= 3) { repairerMax += 1; }
-    if (this.room.memory.creeps.builders < repairerMax && damagedStructures.length > 0)
+    if(getContainerEnergy(room) >= 2000 * room.memory.sources.length) { repairerMax += 3; }
+    
+    if (this.room.memory.creeps.repairers < repairerMax && damagedStructures.length > 0)
     {
-        let ret = this.createGeneric(getMaximum(200, getMinimum(room.energyCapacityAvailable * 0.2, 1000)), 'repairer');
+        let ret = this.createGeneric(getMaximum(200, getMinimum(room.energyCapacityAvailable * 0.5, 1000)), 'repairer');
         if(ret == OK)
         {
             this.room.memory.creeps.repairers++;
@@ -120,7 +126,7 @@ StructureSpawn.prototype.doSpawn = function(room)
     // Check upgraders
     if (room.controller.level >= 5 && Game.getObjectById(room.memory.controllerLink) && Game.getObjectById(room.memory.spawnLink))
     {
-        if (this.room.memory.creeps.upgraders < 1)// || (upgraders.length < 2 && room.memory.extraEnergy))
+        if (this.room.memory.creeps.upgraders < 1)
         {
             let ret = this.createLinkUpgrader(room.energyCapacityAvailable * 0.7);
             if(ret == OK)
@@ -131,22 +137,20 @@ StructureSpawn.prototype.doSpawn = function(room)
             return;
         }
     }
-    else if (room.controller.level >= 3)
+    else 
     {
-        if (this.room.memory.creeps.upgraders < 4 || (this.room.memory.creeps.upgraders < 5 && room.memory.energyConMode >= 2)) 
+        let maxUpgraders = 3;
+        if (room.controller.level >= 4)
         {
-            let ret = this.createGeneric(getMaximum(room.energyCapacityAvailable * 0.8, 200), 'upgrader');
-            if(ret == OK)
-            {
-                this.room.memory.creeps.upgraders++;
-            }
-            else if(ret != ERR_NOT_ENOUGH_ENERGY) { console.log('Error spawning upgrader: ' + ret); }
-            return;
+            if(room.memory.energyConMode >= 2) { maxUpgraders++; }
         }
-    }
-    else
-    {
-        if (this.room.memory.creeps.upgraders < 3 - this.room.memory.creeps.builders) 
+        else
+        {
+            maxUpgraders = maxUpgraders - this.room.memory.creeps.builders;
+            if(getContainerEnergy(room) >= 2000 * room.memory.sources.length) { maxUpgraders += 3; }
+        }
+        
+        if (this.room.memory.creeps.upgraders < maxUpgraders)
         {
             let ret = this.createGeneric(getMaximum(room.energyCapacityAvailable * 0.8, 200), 'upgrader');
             if(ret == OK)

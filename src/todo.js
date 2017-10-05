@@ -1,4 +1,5 @@
 if there is a harvest container, use max range on dropped resources
+better hauler number code
 missed roads from extension code cuz of init roads sites
 improve spawner code
 optimize long distance mining - haulers and such

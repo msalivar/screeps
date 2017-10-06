@@ -46,7 +46,7 @@ StructureSpawn.prototype.doSpawn = function(room)
     }
     
     // Check haulers
-    let haulersNeeded = room.memory.sources.length; // + Math.floor(room.memory.avgSourceRange / 12);
+    let haulersNeeded = getMaximum(1, Math.floor((room.memory.avgSourceRange + room.memory.avgSourceSeparation) / 14));
     if(room.memory.energyConMode < 2 && haulersNeeded > 1 && room.memory.sites && room.memory.sites.length >= 1)
     {
         haulersNeeded -= 1;
@@ -124,11 +124,13 @@ StructureSpawn.prototype.doSpawn = function(room)
     }
     
     // Check upgraders
-    if (room.controller.level >= 5 && Game.getObjectById(room.memory.controllerLink) && Game.getObjectById(room.memory.spawnLink))
+    if(room.controller.level >= 5 && Game.getObjectById(room.memory.controllerLink) && Game.getObjectById(room.memory.spawnLink))
     {
-        if (this.room.memory.creeps.upgraders < 1)
+        let maxUpgraders = 1
+        if(this.room.memory.energyConMode >= 5) { maxUpgraders++; }
+        if(this.room.memory.creeps.upgraders < maxUpgraders)
         {
-            let ret = this.createLinkUpgrader(room.energyCapacityAvailable * 0.7);
+            let ret = this.createLinkUpgrader(room.energyCapacityAvailable);
             if(ret == OK)
             {
                 this.room.memory.creeps.upgraders++;
@@ -152,7 +154,7 @@ StructureSpawn.prototype.doSpawn = function(room)
         
         if (this.room.memory.creeps.upgraders < maxUpgraders)
         {
-            let ret = this.createGeneric(getMaximum(room.energyCapacityAvailable * 0.8, 200), 'upgrader');
+            let ret = this.createGeneric(getMaximum(room.energyCapacityAvailable * 0.6, 200), 'upgrader');
             if(ret == OK)
             {
                 this.room.memory.creeps.upgraders++;
@@ -279,7 +281,7 @@ StructureSpawn.prototype.createLinkUpgrader = function(energy)
     if(this.room.memory.energyConMode >= 3) { workMax += 5; }
     if(this.room.memory.energyConMode >= 4) { workMax += 5; }
     if(this.room.controller.level >= 8 && workMax > 15) { workMax = 15; }
-    while(totalEnergy <= energy - 200 && workCount < workMax)
+    while(totalEnergy <= energy - 300 && workCount < workMax)
     {
         mods.push(WORK);
         totalEnergy += 100;
@@ -289,6 +291,10 @@ StructureSpawn.prototype.createLinkUpgrader = function(energy)
     mods.push(CARRY);
     totalEnergy += 50;
     
+    mods.push(MOVE);
+    totalEnergy += 50;
+    mods.push(MOVE);
+    totalEnergy += 50;
     mods.push(MOVE);
     totalEnergy += 50;
     
@@ -302,7 +308,7 @@ StructureSpawn.prototype.createLinkUpgrader = function(energy)
     }
     
     let name = 'upgrader-' + generateRandomId();
-    return this.spawnCreep(mods, undefined, { memory: {role: 'upgrader', upgrading: false} });
+    return this.spawnCreep(mods, name, { memory: {role: 'upgrader', upgrading: false} });
 };
 
 StructureSpawn.prototype.createLongDistanceMiner = function(energy, targetSource, targetRoom)

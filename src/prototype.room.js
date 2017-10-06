@@ -108,21 +108,7 @@ Room.prototype.doUpkeep = function()
         
     this.findExitPositions();
     this.findExitRooms();
-    
-    if(!this.memory.avgSourceRange || this.memory.avgSourceRange == null)
-    {
-        let range = 0;
-        let spawn = Game.getObjectById(this.memory.spawn);
-        var sources = this.find(FIND_SOURCES);
-        let sourceCount = sources.length;
-        
-        for(let i = 0; i < sourceCount; i++)
-        {
-            range += spawn.pos.getRangeTo(sources[i].pos);
-        }
-        
-        this.memory.avgSourceRange = range / sourceCount;
-    }
+    this.getSourceRangeInfo();
     
     // Increment scout spawn timer
     if(this.controller.level >= 3)
@@ -196,6 +182,67 @@ Room.prototype.reportControllerUpgrade = function()
         this.memory.controlProg = progress;
     }
 }
+
+Room.prototype.getSourceRangeInfo = function()
+{
+    if(!this.memory.avgSourceRange || this.memory.avgSourceRange == null)
+    {
+        let range = 0;
+        let spawn = Game.getObjectById(this.memory.spawn);
+        var sources = this.find(FIND_SOURCES);
+        
+        for(let i = 0; i < sources.length; i++)
+        {
+            let sourcePos = { pos: sources[i].pos, range: 1 };
+            let results = PathFinder.search(spawn.pos, sourcePos, { swampCost: 2});
+            if(results.incomplete)
+            {
+                console.log('source range pathing error');
+            }
+            else
+            {
+                range += results.path.length;
+            }
+        }
+        this.memory.avgSourceRange = range / sources.length;
+    }
+    
+    if(!this.memory.avgSourceSeparation || this.memory.avgSourceSeparation == null)
+    {
+        let distance = 0;
+        var sources = this.find(FIND_SOURCES);
+        
+        for(let i = 0; i < sources.length; i++)
+        {
+            let iPosition = new RoomPosition(sources[i].memory.harvestPos.x, sources[i].memory.harvestPos.y, this.name);
+            let sourceDistance = 0;
+            for(let j = 0; j < sources.length; j++)
+            {
+                if(j != i)
+                {
+                    let jPosition = new RoomPosition(sources[j].memory.harvestPos.x, sources[j].memory.harvestPos.y, this.name);
+                    let sourcePos = { pos: jPosition, range: 1 };
+                    let results = PathFinder.search(iPosition, sourcePos, { swampCost: 2});
+                    if(results.incomplete)
+                    {
+                        console.log('source range pathing error');
+                    }
+                    else
+                    {
+                        sourceDistance += results.path.length;
+                    }
+                }
+            }
+            distance += sourceDistance / (sources.length - 1);
+        }
+        this.memory.avgSourceSeparation = distance / sources.length;
+    }
+}
+
+
+
+
+
 
 
 

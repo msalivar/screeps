@@ -1,4 +1,5 @@
 if there is a harvest container, use max range on dropped resources
+min/max energy ratio for creep spawns & get energy resources in room dropped/container
 better hauler number code
 missed roads from extension code cuz of init roads sites
 improve spawner code

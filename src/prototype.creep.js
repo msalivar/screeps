@@ -34,8 +34,7 @@ Creep.prototype.getEnergy = function()
         let limit = getMinimum(this.carryCapacity, 100);
         if (this.memory.role == 'hauler')
         {
-            //if (this.room.memory.extraEnergy) { limit = this.carryCapacity * 0.85; }
-            limit = this.carryCapacity * 0.75;
+            limit = this.carryCapacity * 0.6;
         }
         let container = this.pos.findClosestByRange(FIND_STRUCTURES,
         {

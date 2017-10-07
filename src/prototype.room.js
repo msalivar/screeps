@@ -239,9 +239,37 @@ Room.prototype.getSourceRangeInfo = function()
     }
 }
 
+Room.prototype.findRepairTarget = function()
+{
+    let damagedStructures = this.find(FIND_STRUCTURES,
+    {
+        filter: (structure) => (structure.hits < structure.hitsMax && structure.structureType != STRUCTURE_WALL && structure.structureType != STRUCTURE_RAMPART && structure.structureType != STRUCTURE_ROAD)
+                            || (structure.hits < global.config.options.minWallHits && (structure.structureType == STRUCTURE_WALL || structure.structureType == STRUCTURE_RAMPART))
+                            || (structure.structureType == STRUCTURE_ROAD && structure.hits < structure.hitsMax / 2)
+    });
+    if(damagedStructures.length)
+    {
+        let lowestHitStructure = _.min(damagedStructures, _.property('hits'));
+        return lowestHitStructure.id;
+    }
+    else
+    {
+        return undefined;
+    }
+};
 
-
-
+Room.prototype.checkWallHits = function()
+{
+    let hitLimit = global.config.options.minWallHits;
+    if(this.controller.level >= 8) { hitLimit = 300000000; }
+    
+    let damagedStructures = this.find(FIND_STRUCTURES,
+    {
+        filter: (structure) => (structure.hits < hitLimit && (structure.structureType == STRUCTURE_WALL || structure.structureType == STRUCTURE_RAMPART))
+    });
+    if(damagedStructures.length) { return true; }
+    else { return false; }
+}
 
 
 

@@ -20,36 +20,29 @@ Room.prototype.checkRoom = function()
         }
     }
     
+    // From here onwards is for neighboring rooms only
+    if(!this.memory.neighborData) { this.memory.neighborData = {}; }
+    
     if(this.controller)
     {
-        this.memory.hostileControlled = (this.controller.level > 0 && !this.controller.my);
+        this.memory.neighborData.hostileControlled = (this.controller.level > 0 && !this.controller.my);
     }
     
     let enemyCreeps = this.find(FIND_HOSTILE_CREEPS);
-    if(enemyCreeps.length)
-    {
-        this.memory.hostile = true;
-    }
-    else
-    {
-        this.memory.hostile = false;
-    }
+    this.memory.neighborData.hostile = enemyCreeps.length > 0;
     
     let enemyStructures = this.find(FIND_HOSTILE_STRUCTURES);
-    if(enemyStructures.length)
-    {
-        this.memory.hostileStructures = true;
-    }
-    else
-    {
-        this.memory.hostileStructures = false;
-    }
+    this.memory.neighborData.hostileStructures = enemyStructures.length > 0;
+    
+    if(!this.memory.neighborData.claimer) { this.memory.neighborData.claimer = 'none'; }
+    if(!this.memory.neighborData.longHarvester) { this.memory.neighborData.longHarvester = 'none'; }
+    if(!this.memory.neighborData.longHauler) { this.memory.neighborData.longHauler = 'none'; }
 };
 
 Room.prototype.cacheRoom = function()
 {
     if(!this.memory.cacheTick) { this.memory.cacheTick = 0; }
-    if(this.memory.cacheTick < 50) { this.memory.cacheTick++; }
+    if(this.memory.cacheTick < 30) { this.memory.cacheTick++; }
     else
     {
         this.memory.cacheTick = 0;

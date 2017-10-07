@@ -2,7 +2,6 @@
 
 Creep.prototype.doLongDistanceMine = function()
 {
-    if(!this.memory.homeRoom) { this.memory.homeRoom = this.room.name; }
     if(!this.memory.transferred) { this.memory.transferred = 0; }
     
     if(this.room.name == this.memory.destination)

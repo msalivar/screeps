@@ -30,30 +30,12 @@ Room.prototype.tryConstruct = function()
         this.initRoads();
         this.createExtensions();
     }
-    
-    // Adjust wall hit limit
-    // if(!this.memory.wallHitMax)
-    // {
-    //     this.memory.wallHitMax = 15000;
-    //     this.memory.wallHitTick = 0;
-    // }
-    // if(this.memory.wallHitTick < 50) { this.memory.wallHitTick++; }
-    // else
-    // {
-    //     if(this.memory.energyConMode >= 2)
-    //     {
-    //         this.memory.wallHitMax = getMinimum(this.memory.wallHitMax + 300, 500000)
-    //     }
-    //     else
-    //     {
-    //         this.memory.wallHitMax = getMaximum(this.memory.wallHitMax - 200, 15000);
-    //     }
-    //     this.memory.wallHitTick = 0;
-    // }
 }
 
 Room.prototype.initRoads = function()
 {
+    let maxRoads = 15;
+        
     let spawn = Game.getObjectById(this.memory.spawn);
     if(spawn)
     {
@@ -74,8 +56,9 @@ Room.prototype.initRoads = function()
         {
             return { pos: source.memory.harvestPos, range: 0 };
         });
-        
         let controllerObj = { pos: this.controller.pos, range: 1 };
+        
+        let roadCount = 0;
         
         for(let i in sources)
         {
@@ -85,7 +68,8 @@ Room.prototype.initRoads = function()
             {
                 for(let i in results.path)
                 {
-                    this.createConstructionSite(results.path[i], STRUCTURE_ROAD);
+                    if(this.createConstructionSite(results.path[i], STRUCTURE_ROAD) == OK) { roadCount++; }
+                    if(roadCount >= maxRoads) { return; }
                 }
             }
             
@@ -95,7 +79,8 @@ Room.prototype.initRoads = function()
             {
                 for(let i in results.path)
                 {
-                    this.createConstructionSite(results.path[i], STRUCTURE_ROAD);
+                    if(this.createConstructionSite(results.path[i], STRUCTURE_ROAD) == OK) { roadCount++; }
+                    if(roadCount >= maxRoads) { return; }
                 }
             }
         }
@@ -106,7 +91,8 @@ Room.prototype.initRoads = function()
         {
             for(let i in results.path)
             {
-                this.createConstructionSite(results.path[i], STRUCTURE_ROAD);
+                if(this.createConstructionSite(results.path[i], STRUCTURE_ROAD) == OK) { roadCount++; }
+                if(roadCount >= maxRoads) { return; }
             }
         }
         
@@ -123,7 +109,8 @@ Room.prototype.initRoads = function()
                 {
                     for(let i in results.path)
                     {
-                        this.createConstructionSite(results.path[i], STRUCTURE_ROAD);
+                        if(this.createConstructionSite(results.path[i], STRUCTURE_ROAD) == OK) { roadCount++; }
+                        if(roadCount >= maxRoads) { return; }
                     }
                 }
             }
@@ -137,7 +124,8 @@ Room.prototype.initRoads = function()
                 {
                     for(let i in results.path)
                     {
-                        this.createConstructionSite(results.path[i], STRUCTURE_ROAD);
+                        if(this.createConstructionSite(results.path[i], STRUCTURE_ROAD) == OK) { roadCount++; }
+                        if(roadCount >= maxRoads) { return; }
                     }
                 }
             }
@@ -151,7 +139,8 @@ Room.prototype.initRoads = function()
                 {
                     for(let i in results.path)
                     {
-                        this.createConstructionSite(results.path[i], STRUCTURE_ROAD);
+                        if(this.createConstructionSite(results.path[i], STRUCTURE_ROAD) == OK) { roadCount++; }
+                        if(roadCount >= maxRoads) { return; }
                     }
                 }
             }
@@ -165,7 +154,8 @@ Room.prototype.initRoads = function()
                 {
                     for(let i in results.path)
                     {
-                        this.createConstructionSite(results.path[i], STRUCTURE_ROAD);
+                        if(this.createConstructionSite(results.path[i], STRUCTURE_ROAD) == OK) { roadCount++; }
+                        if(roadCount >= maxRoads) { return; }
                     }
                 }
             }
@@ -175,7 +165,6 @@ Room.prototype.initRoads = function()
 
 Room.prototype.createStructures = function()
 {
-        
     let spawn = Game.getObjectById(this.memory.spawn);
     if (!spawn) { return; }
     if (this.controller.level >= 2)
@@ -300,12 +289,13 @@ Room.prototype.createExtensions = function()
                 //console.log('[i]: ' + i + ' [j]: ' + j + ' [building ext]: ' + position);
                 if (this.createConstructionSite(position, STRUCTURE_EXTENSION) == OK)
                 {
+                    count++;
                     this.createConstructionSite(new RoomPosition(position.x, position.y - 1, spawn.room.name), STRUCTURE_ROAD);
                     this.createConstructionSite(new RoomPosition(position.x, position.y + 1, spawn.room.name), STRUCTURE_ROAD);
                     if (j == rowLength - 1) { this.createConstructionSite(new RoomPosition(position.x + 1, position.y, spawn.room.name), STRUCTURE_ROAD); }
                     else if (j == 0) { this.createConstructionSite(new RoomPosition(position.x - 1, position.y, spawn.room.name), STRUCTURE_ROAD); }
                 }
-                if (++count >= countMax) { return; }
+                if (count >= countMax) { return; }
             }
         }
     }
@@ -456,9 +446,6 @@ Room.prototype.buildWall = function(pos, x, y, rampart)
     }
     return false;
 }
-
-
-
 
 
 

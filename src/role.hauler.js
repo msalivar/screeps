@@ -17,17 +17,13 @@ Creep.prototype.doHaul = function()
     {
         if(this.room.memory.defConMode == 'active')
         {
-            if (this.findTower(850)) { return; }
+            if (this.findTower(800)) { return; }
             if (this.findSpawnOrExtension()) { return; }
             if (this.findStorage()) { return; }
             return;
         }
         
-        let suppliers = this.room.find(FIND_MY_CREEPS,
-        {
-            filter: (creep) => creep.memory.role == 'supplier'
-        });
-        if(!suppliers.length || !this.room.memory.storage || !Game.getObjectById(this.room.memory.storage))
+        if(this.room.memory.creeps.suppliers <= 0 || !this.room.memory.storage || !Game.getObjectById(this.room.memory.storage))
         {
             if (this.findTower(400)) { return; }
             if (this.findSpawnOrExtension()) { return; }

@@ -41,22 +41,6 @@ Creep.prototype.doSupply = function()
     }
 };
 
-Creep.prototype.withdrawFromStorage = function()
-{
-    if(this.room.memory.storage)
-    {
-        let storageStructure = Game.getObjectById(this.room.memory.storage);
-        if(storageStructure)
-        {
-            if(storageStructure.store[RESOURCE_ENERGY] <= 500) { return false; }
-            this.travelTo(storageStructure);
-            this.withdraw(storageStructure, RESOURCE_ENERGY);
-            return true;
-        }
-    }
-    return false;
-}
-
 Creep.prototype.findSpawnOrExtension = function()
 {
     let target = this.pos.findClosestByRange(FIND_MY_STRUCTURES,

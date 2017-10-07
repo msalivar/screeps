@@ -38,6 +38,9 @@ cleanCreepMemory = function()
                     //Memory.sources[Memory.creeps[name].target].harvester = 'none';
                     //console.log('Long distance hauler expired - Transferred: ' + Memory.creeps[name].transferred + ' Target: ' + Memory.creeps[name].target);
                     break;
+                case 'claimer':
+                    Memory.rooms[Memory.creeps[name].target].neighborData.claimer = 'none';
+                    break;
                 default:
                     break;
             }
@@ -183,12 +186,7 @@ checkIfBuildable = function(roomPos)
     let structures = roomPos.lookFor(LOOK_STRUCTURES);
     //console.log('terrain: ' + terrain[0] + 'structures: ' + structures.length);
     return (terrain[0] != 'wall') && (structures.length <= 0 || (structures.length == 1 && structures[0].structureType == 'road'));
-}
-
-
-
-
-
+};
 
 
 

@@ -87,7 +87,7 @@ StructureSpawn.prototype.doSpawn = function(room)
     let sites = room.find(FIND_CONSTRUCTION_SITES);
     let maxBuilders = 1;
     if(getContainerEnergy(room) >= 2000 * room.memory.sources.length) { maxBuilders++; }
-    if(this.room.controller.level >= 2 && sites.length >= 5) { maxBuilders++; }
+    if(room.controller.level >= 2 && sites.length >= 5) { maxBuilders++; }
     if(sites.length >= 10 && room.memory.energyConMode >= 2) { maxBuilders++; }
     
     if(sites.length > 0 && this.room.memory.creeps.builders < maxBuilders)
@@ -102,22 +102,16 @@ StructureSpawn.prototype.doSpawn = function(room)
     }
     
     // Check repairers
-    let damagedStructures = room.find(FIND_STRUCTURES,
-    {
-        filter: (structure) => (structure.structureType == STRUCTURE_RAMPART || 
-            structure.structureType == STRUCTURE_WALL) && 
-            (structure.hits < structure.hitsMax)
-    });
     let repairerMax = 2;
-    if(this.room.memory.energyConMode >= 3) { repairerMax += 1; }
-    if(getContainerEnergy(room) >= 2000 * room.memory.sources.length) { repairerMax += 3; }
-    
-    if (this.room.memory.creeps.repairers < repairerMax && damagedStructures.length > 0)
+    if(room.memory.energyConMode >= 3) { repairerMax += 1; }
+    if(getContainerEnergy(room) >= 2000 * room.memory.sources.length) { repairerMax += 1; }
+    if(!room.checkWallHits) { repairerMax = 1; }
+    if (room.memory.creeps.repairers < repairerMax && room.findRepairTarget())
     {
         let ret = this.createGeneric(getMaximum(200, getMinimum(room.energyCapacityAvailable * 0.5, 1000)), 'repairer');
         if(ret == OK)
         {
-            this.room.memory.creeps.repairers++;
+            room.memory.creeps.repairers++;
         }
         else if(ret != ERR_NOT_ENOUGH_ENERGY) { console.log('Error spawning repairer: ' + ret); }
         return;
@@ -127,13 +121,13 @@ StructureSpawn.prototype.doSpawn = function(room)
     if(room.controller.level >= 5 && Game.getObjectById(room.memory.controllerLink) && Game.getObjectById(room.memory.spawnLink))
     {
         let maxUpgraders = 1
-        if(this.room.memory.energyConMode >= 5) { maxUpgraders++; }
-        if(this.room.memory.creeps.upgraders < maxUpgraders)
+        if(room.memory.energyConMode >= 5) { maxUpgraders++; }
+        if(room.memory.creeps.upgraders < maxUpgraders)
         {
             let ret = this.createLinkUpgrader(room.energyCapacityAvailable);
             if(ret == OK)
             {
-                this.room.memory.creeps.upgraders++;
+                room.memory.creeps.upgraders++;
             }
             else if(ret != ERR_NOT_ENOUGH_ENERGY) { console.log('Error spawning upgrader: ' + ret); }
             return;
@@ -170,7 +164,7 @@ StructureSpawn.prototype.doSpawn = function(room)
         if(room.memory.scoutTick >= global.config.options.scoutTimer)
         {
             let name = 'scout-' + generateRandomId();
-            let ret =this.spawnCreep( [MOVE], name, { memory: {role: 'scout'} });
+            let ret = this.spawnCreep( [MOVE], name, { memory: {role: 'scout'} });
             if(ret == OK)
             {
                 room.memory.scoutTick = 0;
@@ -180,27 +174,39 @@ StructureSpawn.prototype.doSpawn = function(room)
         }
     }
     
-    //Make long distance miners
-    if(room.memory.storage && Game.getObjectById(room.memory.storage))
-    {
-        for(let name of this.room.memory.exitRooms)
-        {
-            if(!Memory.rooms[name].hostile)
-            {
-                for(let source of Memory.rooms[name].sources)
-                {
-                    if(Memory.sources[source].harvester == 'none')
-                    {
-                        // if(this.createLongDistanceMiner(getMaximum(room.energyCapacityAvailable * 0.4, 600), source, name) == OK)
-                        // {
-                        //     Memory.sources[source].harvester = 'long';
-                        //     return;
-                        // }
-                    }
-                }
-            }
-        }
-    }
+    // Check neighbor rooms
+    // if(room.memory.storage && Game.getObjectById(room.memory.storage))
+    // {
+    //     for(let name of this.room.memory.exitRooms)
+    //     {
+    //         if(!Memory.rooms[name].neighborData.hostile)
+    //         {
+    //             for(let source of Memory.rooms[name].sources)
+    //             {
+    //                 if(Memory.sources[source].longHarvester == 'none')
+    //                 {
+    //                     if(this.createLongDistanceHarvester(getMaximum(room.energyCapacityAvailable * 0.4, 600), source, name) == OK)
+    //                     {
+    //                         Memory.sources[source].harvester = 'long';
+    //                         return;
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
+    
+    // if(Memory.rooms['W8N2'].neighborData.claimer == 'none')
+    // {
+    //     let ret = this.createClaimer(getMaximum(room.energyCapacityAvailable * 0.5, 1300), 'W8N2');
+    //     //console.log(ret);
+    //     if(ret == OK)
+    //     {
+    //         Memory.rooms['W8N2'].neighborData.claimer = 'active';
+    //         console.log('ye');
+    //     }
+    //     else if(ret != ERR_NOT_ENOUGH_ENERGY) { console.log('Error spawning claimer: ' + ret); }
+    // }
 };
 
 StructureSpawn.prototype.createHarvester = function(energy, targetSource, harvestPos)
@@ -339,4 +345,73 @@ StructureSpawn.prototype.createLongDistanceMiner = function(energy, targetSource
     let name = 'longMiner-' + generateRandomId();
     return this.spawnCreep(mods, name, { memory: {role: 'longDistanceMiner', target: targetSource, destination: targetRoom} });
 };
+
+StructureSpawn.prototype.createLongDistanceHarvester = function(energy, targetSource, targetRoom)
+{
+    let totalEnergy = 0;
+    let mods = [];
+    
+    while(totalEnergy < energy - 100 && totalEnergy < 500)
+    {
+        mods.push(WORK);
+        totalEnergy += 100;
+    }
+    mods.push(MOVE);
+    totalEnergy += 50;
+    
+    for (let i = 0; i < 2; i++)
+    {
+        if (totalEnergy < energy - 50)
+        {
+            mods.push(MOVE);
+            totalEnergy += 50;
+        }
+    }
+    
+    let name = 'harvester-' + generateRandomId();
+    return this.spawnCreep(mods, name, { memory: {role: 'harvester' , target: targetSource, targetPos: harvestPos} });
+};
+
+StructureSpawn.prototype.createLongDistanceHauler = function(energy, targetSource, targetRoom)
+{
+    let numberOfParts = getMinimum(Math.floor(energy / 150), 16);
+    let mods = [];
+    
+    for(let i = 0; i < numberOfParts; i++)
+    {
+        mods.push(CARRY);
+        mods.push(CARRY);
+    }
+    for(let i = 0; i < numberOfParts; i++)
+    {
+        mods.push(MOVE);
+    }
+    
+    let name = 'hauler-' + generateRandomId();
+    return this.spawnCreep(mods, name, { memory: {role: 'hauler', hauling: false} });
+};
+
+StructureSpawn.prototype.createClaimer = function(energy, targetRoom)
+{
+    let numberOfParts = getMinimum(Math.floor((energy - 650) / 650), 2);
+    let mods = [];
+    
+    mods.push(MOVE);
+    for(let i = 0; i < numberOfParts; i++)
+    {
+        mods.push(MOVE);
+    }
+    mods.push(CLAIM);
+    for(let i = 0; i < numberOfParts; i++)
+    {
+        mods.push(CLAIM);
+    }
+    
+    let name = 'claimer-' + generateRandomId();
+    return this.spawnCreep(mods, name, { memory: {role: 'claimer', target: targetRoom} });
+};
+
+
+
+
 

@@ -2,7 +2,7 @@
 
 Creep.prototype.getEnergy = function()
 {
-    if (this.memory.role == 'hauler' || this.room.memory.energyConMode < 2)
+    if (this.memory.role == 'hauler' || this.memory.role == 'supplier' ||this.room.memory.energyConMode < 2)
     {
         let source = this.pos.findClosestByRange(FIND_DROPPED_RESOURCES,
         {
@@ -21,7 +21,7 @@ Creep.prototype.getEnergy = function()
         }
         else
         {
-            if (source && this.pos.getRangeTo(source.pos) <= 3)
+            if (source && this.pos.getRangeTo(source.pos) <= 5)
             {
                 if(this.pickup(source) == ERR_NOT_IN_RANGE)
                 {
@@ -67,6 +67,22 @@ Creep.prototype.findSource = function()
     }
     return 'error';
 };
+
+Creep.prototype.withdrawFromStorage = function()
+{
+    if(this.room.memory.storage)
+    {
+        let storageStructure = Game.getObjectById(this.room.memory.storage);
+        if(storageStructure)
+        {
+            if(storageStructure.store[RESOURCE_ENERGY] <= 500) { return false; }
+            this.travelTo(storageStructure);
+            this.withdraw(storageStructure, RESOURCE_ENERGY);
+            return true;
+        }
+    }
+    return false;
+}
 
 Creep.prototype.checkRecycle = function()
 {

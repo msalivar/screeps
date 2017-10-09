@@ -26,17 +26,15 @@ Room.prototype.checkRoom = function()
     if(this.controller)
     {
         this.memory.neighborData.hostileControlled = (this.controller.level > 0 && !this.controller.my);
+        this.memory.neighborData.claimedByMe = this.controller.level > 0 && this.controller.my;
     }
     
     let enemyCreeps = this.find(FIND_HOSTILE_CREEPS);
-    this.memory.neighborData.hostile = enemyCreeps.length > 0;
-    
     let enemyStructures = this.find(FIND_HOSTILE_STRUCTURES);
-    this.memory.neighborData.hostileStructures = enemyStructures.length > 0;
+    this.memory.neighborData.hostile = enemyCreeps.length > 0 || enemyStructures.length > 0;
     
+    // Init neighbor operations memory
     if(!this.memory.neighborData.claimer) { this.memory.neighborData.claimer = 'none'; }
-    if(!this.memory.neighborData.longHarvester) { this.memory.neighborData.longHarvester = 'none'; }
-    if(!this.memory.neighborData.longHauler) { this.memory.neighborData.longHauler = 'none'; }
 };
 
 Room.prototype.cacheRoom = function()

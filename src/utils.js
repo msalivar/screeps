@@ -32,11 +32,11 @@ cleanCreepMemory = function()
                     Game.rooms[Memory.creeps[name].homeRoom].memory.creeps.miners--;
                     break;
                 case 'longDistanceHarvester':
-                    //Memory.sources[Memory.creeps[name].target].harvester = 'none';
+                    Memory.sources[Memory.creeps[name].target].longHarvester = 'none';
                     break;
                 case 'longDistanceHauler':
-                    //Memory.sources[Memory.creeps[name].target].harvester = 'none';
-                    //console.log('Long distance hauler expired - Transferred: ' + Memory.creeps[name].transferred + ' Target: ' + Memory.creeps[name].target);
+                    Memory.sources[Memory.creeps[name].target].longHauler = 'none';
+                    console.log('Long distance hauler expired - Transferred: ' + Memory.creeps[name].transferred + ' Target: ' + Memory.creeps[name].target);
                     break;
                 case 'claimer':
                     Memory.rooms[Memory.creeps[name].target].neighborData.claimer = 'none';
@@ -63,14 +63,42 @@ getContainerEnergy = function(room)
             if(structures[i].structureType == STRUCTURE_CONTAINER) { energyTotal += structures[i].store[RESOURCE_ENERGY]; }
         }
     }
+    let resources = room.find(FIND_DROPPED_RESOURCES,
+    {
+        filter: (resource) => { return resource.resourceType == RESOURCE_ENERGY }
+    });
+    for(let energy of resources)
+    {
+        energyTotal += energy.amount;
+    }
+    
     return energyTotal;
 };
 
 generateRandomId = function()
 {
     return (Math.floor(Math.random() * 10000)).toString();
-}
+};
 
+getNumMyRooms = function()
+{
+    let count = 0;
+    for(room in Game.rooms)
+    {
+        if(Game.rooms[room].controller && Game.rooms[room].controller.my)
+        {
+            count++;
+        }
+    }
+    return count;
+};
+
+ableToClaimRoom = function()
+{
+    return getNumMyRooms() < Game.gcl.level;
+};
+
+// Returns true if there is an adjacent position to harvest from source
 checkSpaceToHarvest = function(source)
 {
     let array = [
@@ -98,14 +126,6 @@ checkSpaceToHarvest = function(source)
             return true;
         }
     }
-};
-
-// creep = creep object, target = RoomPosition
-onPosition = function(creep, target)
-{
-    return (creep.pos.x == target.x &&
-            creep.pos.y == target.y &&
-            creep.pos.roomName == target.roomName);
 };
 
 findConstructionSite = function(source, roomName)

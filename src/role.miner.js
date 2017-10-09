@@ -1,14 +1,6 @@
 Creep.prototype.doMine = function()
 {
-    let harvesters = this.room.find(FIND_MY_CREEPS,
-    {
-        filter: (creep) => creep.memory.role == 'harvester'
-    });
-    let haulers = this.room.find(FIND_MY_CREEPS,
-    {
-        filter: (creep) => creep.memory.role == 'hauler'
-    });
-    if (harvesters.length > 0 && haulers.length > 0)
+    if (this.room.memory.creeps.harvesters > 0 && this.room.memory.creeps.haulers > 0)
     {
         let spawn = Game.getObjectById(this.room.memory.spawn);
         if (spawn)

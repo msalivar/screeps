@@ -17,7 +17,7 @@ Creep.prototype.doHaul = function()
     {
         if(this.room.memory.defConMode == 'active')
         {
-            if (this.findTower(800)) { return; }
+            if (this.findTower(400)) { return; }
             if (this.findSpawnOrExtension()) { return; }
             if (this.findStorage()) { return; }
             return;
@@ -25,12 +25,12 @@ Creep.prototype.doHaul = function()
         
         if(this.room.memory.creeps.suppliers <= 0 || !this.room.memory.storage || !Game.getObjectById(this.room.memory.storage))
         {
-            if (this.findTower(400)) { return; }
+            if (this.findTower(900)) { return; }
             if (this.findSpawnOrExtension()) { return; }
-            if (this.findLink()) { return; }
-            if (this.findTower(850)) { return; }
+            if (this.findLink(800)) { return; }
         }
         
+        if (this.findLink(800)) { return; }
         if (this.findStorage()) { return; }
         
         // Go home
@@ -48,11 +48,10 @@ Creep.prototype.doHaul = function()
 
 Creep.prototype.findStorage = function(threshold)
 {
-    let storage = Game.getObjectById(this.room.memory.storage);
-    if(storage)
+    if(this.room.storage)
     {
-        this.travelTo(storage);
-        this.transfer(storage, RESOURCE_ENERGY);
+        this.travelTo(this.room.storage);
+        this.transfer(this.room.storage, RESOURCE_ENERGY);
         return true;
     }
     return false;

@@ -1,5 +1,48 @@
 'use strict';
 
+Creep.prototype.run = function()
+{
+    switch(this.memory.role)
+    {
+        case 'harvester':
+            this.doHarvest();
+            break;
+        case 'upgrader':
+            this.doUpgrade();
+            break;
+        case 'builder':
+            this.doBuild();
+            break;
+        case 'repairer':
+            this.doRepair();
+            break;
+        case 'hauler':
+            this.doHaul();
+            break;
+        case 'miner':
+            this.doMine();
+            break;
+        case 'supplier':
+            this.doSupply();
+            break;
+        case 'scout':
+            this.doScout();
+            break;
+        case 'longDistanceHarvester':
+            this.doLongDistanceHarvest();
+            break;
+        case 'longDistanceHauler':
+            this.doLongDistanceHaul();
+            break;
+        case 'claimer':
+            this.doClaim();
+            break;
+        default:
+            console.log('ERROR: Creep ' + this.name + ' does not have a role.');
+            break;
+    }
+};
+
 Creep.prototype.getEnergy = function()
 {
     if (this.memory.role == 'hauler' || this.memory.role == 'supplier' ||this.room.memory.energyConMode < 2)
@@ -34,7 +77,7 @@ Creep.prototype.getEnergy = function()
         let limit = getMinimum(this.carryCapacity, 100);
         if (this.memory.role == 'hauler')
         {
-            limit = this.carryCapacity * 0.6;
+            limit = this.carryCapacity * 0.3;
         }
         let container = this.pos.findClosestByRange(FIND_STRUCTURES,
         {

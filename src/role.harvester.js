@@ -3,17 +3,17 @@
 Creep.prototype.doHarvest = function()
 {
     let target = Game.getObjectById(this.memory.target);
-    let position = new RoomPosition(target.memory.harvestPos.x, target.memory.harvestPos.y, target.memory.harvestPos.roomName);
-    if (!onPosition(this, position))
+    let harvestPos = new RoomPosition(target.memory.harvestPos.x, target.memory.harvestPos.y, target.memory.harvestPos.roomName);
+    if (!this.pos.isEqualTo(harvestPos))
     {
-        this.moveTo(position);
+        this.moveTo(harvestPos);
     }
     else
     {
         this.harvest(target);
-        if (this.room.controller.level >= 3 && checkIfBuildable(position))
+        if (this.room.controller.level >= 2 && checkIfBuildable(harvestPos))
         {
-            this.room.createConstructionSite(position, STRUCTURE_CONTAINER);
+            this.room.createConstructionSite(harvestPos, STRUCTURE_CONTAINER);
         }
     }
 };

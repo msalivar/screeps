@@ -59,7 +59,7 @@ Room.prototype.runEnergyCon = function()
             this.memory.energyConMode = 0;
         }
     }
-    if(!this.memory.energyConMode) { this.memory.energyConMode = 0; }
+    else { this.memory.energyConMode = 0; }
 };
 
 Room.prototype.init = function()
@@ -245,7 +245,7 @@ Room.prototype.findRepairTarget = function()
     {
         filter: (structure) => (structure.hits < structure.hitsMax && structure.structureType != STRUCTURE_WALL && structure.structureType != STRUCTURE_RAMPART && structure.structureType != STRUCTURE_ROAD)
                             || (structure.hits < global.config.options.minWallHits && (structure.structureType == STRUCTURE_WALL || structure.structureType == STRUCTURE_RAMPART))
-                            || (structure.structureType == STRUCTURE_ROAD && structure.hits < structure.hitsMax / 2)
+                            || (structure.structureType == STRUCTURE_ROAD && structure.hits < structure.hitsMax * 0.6)
     });
     if(damagedStructures.length)
     {
@@ -258,7 +258,7 @@ Room.prototype.findRepairTarget = function()
     }
 };
 
-Room.prototype.checkWallHits = function()
+Room.prototype.getNumDamagedWalls = function()
 {
     let hitLimit = global.config.options.minWallHits;
     if(this.controller.level >= 8) { hitLimit = 300000000; }
@@ -267,10 +267,19 @@ Room.prototype.checkWallHits = function()
     {
         filter: (structure) => (structure.hits < hitLimit && (structure.structureType == STRUCTURE_WALL || structure.structureType == STRUCTURE_RAMPART))
     });
-    if(damagedStructures.length) { return true; }
-    else { return false; }
+    return damagedStructures.length ? damagedStructures.length : 0;
 }
 
+Room.prototype.getNumRepairTargets = function()
+{
+    let damagedStructures = this.find(FIND_STRUCTURES,
+    {
+        filter: (structure) => (structure.hits < structure.hitsMax && structure.structureType != STRUCTURE_WALL && structure.structureType != STRUCTURE_RAMPART && structure.structureType != STRUCTURE_ROAD)
+                            || (structure.hits < global.config.options.minWallHits && (structure.structureType == STRUCTURE_WALL || structure.structureType == STRUCTURE_RAMPART))
+                            || (structure.structureType == STRUCTURE_ROAD && structure.hits < structure.hitsMax * 0.6)
+    });
+    return damagedStructures.length ? damagedStructures.length : 0;
+};
 
 
 

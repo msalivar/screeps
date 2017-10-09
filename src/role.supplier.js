@@ -2,7 +2,7 @@
 
 Creep.prototype.doSupply = function()
 {
-    if(this.memory.hauling && this.carry[RESOURCE_ENERGY] == 0)
+    if(this.memory.hauling && this.carry[RESOURCE_ENERGY] <= getMaximum(50, this.carryCapacity * 0.2))
     {
         this.memory.hauling = false;
     }
@@ -15,18 +15,18 @@ Creep.prototype.doSupply = function()
     {
         if(this.room.memory.defConMode == 'active')
         {
-            if (this.findTower(700)) { return; }
+            if (this.findTower(500)) { return; }
             if (this.findSpawnOrExtension()) { return; }
             return;
         }
         
-        if (this.findTower(400)) { return; }
+        if (this.findTower(900)) { return; }
         if (this.findSpawnOrExtension()) { return; }
-        if (this.room.memory.energyConMode >= 1)
-        {
-            if (this.findLink()) { return; }
-        }
-        if (this.findTower(850)) { return; }
+        if (this.findLink(800)) { return; }
+        // if (this.room.memory.energyConMode >= 1)
+        // {
+        //     if (this.findLink(800)) { return; }
+        // }
         
         // Go home
         let spawns = this.room.find(FIND_MY_SPAWNS);
@@ -85,8 +85,7 @@ Creep.prototype.findLink = function(threshold)
     if (!this.room.memory.spawnLink) { return false; }
     let spawnLink = Game.getObjectById(this.room.memory.spawnLink);
     if (!spawnLink) { return false; }
-    
-    if (spawnLink.energy < spawnLink.energyCapacity)
+    if (spawnLink.energy < threshold)
     {
         this.travelTo(spawnLink);
         this.transfer(spawnLink, RESOURCE_ENERGY);

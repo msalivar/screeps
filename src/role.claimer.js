@@ -4,6 +4,7 @@ Creep.prototype.doClaim = function()
 {
     if(this.room.name == this.memory.target)
     {
+        // If we are home due to successful claim, recycle
         if(this.room.memory.spawn)
         {
             let spawn = Game.getObjectById(this.room.memory.spawn);
@@ -23,14 +24,23 @@ Creep.prototype.doClaim = function()
             return;
         }
         
-        let ret = this.claimController(this.room.controller);
+        if(this.room.memory.sources.length >= 2 && ableToClaimRoom())
+        {
+            let ret = this.claimController(this.room.controller);
+            if(ret == OK)
+            {
+                return;
+            }
+            else if(ret == ERR_NOT_IN_RANGE)
+            {
+                this.travelTo(this.room.controller.pos);
+            }
+        }
+        
+        let ret = this.reserveController(this.room.controller);
         if(ret == ERR_NOT_IN_RANGE)
         {
             this.travelTo(this.room.controller.pos);
-        }
-        else if(ret == ERR_INVALID_TARGET || ret == ERR_GCL_NOT_ENOUGH)
-        {
-            this.reserveController(this.room.controller);
         }
     }
     else

@@ -34,7 +34,7 @@ Room.prototype.tryConstruct = function()
 
 Room.prototype.initRoads = function()
 {
-    let maxRoads = 15;
+    let maxRoads = 5;
         
     let spawn = Game.getObjectById(this.memory.spawn);
     if(spawn)
@@ -181,22 +181,17 @@ Room.prototype.createStructures = function()
     }
     if (this.controller.level >= 5)
     {
-        this.createConstructionSite(spawn.pos.x, spawn.pos.y + 3, STRUCTURE_TOWER);
+        this.buildTower(spawn.pos);
         this.createLinks();
     }
     if (this.controller.level >= 6)
     {
-        
     }
     if (this.controller.level >= 7)
     {
-        this.createConstructionSite(spawn.pos.x, spawn.pos.y - 4, STRUCTURE_TOWER);
     }
     if (this.controller.level >= 8)
     {
-        // this.createConstructionSite(spawn.pos.x - 2, spawn.pos.y + 2, STRUCTURE_TOWER);
-        // this.createConstructionSite(spawn.pos.x + 3, spawn.pos.y - 2, STRUCTURE_TOWER);
-        // this.createConstructionSite(spawn.pos.x - 3, spawn.pos.y + 2, STRUCTURE_TOWER);
     }
 };
 
@@ -426,26 +421,160 @@ Room.prototype.buildWall = function(pos, x, y, rampart)
     newPos.y += y;
     if(checkIfBuildable(newPos))
     {
-        if(rampart == true)
-        {
-            if(this.createConstructionSite(newPos, STRUCTURE_RAMPART) == OK)
-            {
-                //console.log('rampart: ' + pos + ' ' + x + ' ' + y);
-                return true;
-            }
-        }
-        else
-        {
-            if(this.createConstructionSite(newPos, STRUCTURE_WALL) == OK)
-            {
-                //console.log('wall: ' + pos + x + y);
-                return true;
-            }
-        }
-        return false;
+        if(rampart == true && this.createConstructionSite(newPos, STRUCTURE_RAMPART) == OK) { return true; }
+        else if(this.createConstructionSite(newPos, STRUCTURE_WALL) == OK) { return true; }
     }
     return false;
 }
+
+Room.prototype.buildTower = function(origin)
+{
+    if(this.createBotTower()) { return true; }
+    else if(this.createTopTower()) { return true; }
+    else if(this.createLeftTower()) { return true; }
+    else if(this.createRightTower()) { return true; }
+    else if(this.createConstructionSite(origin.x, origin.y + 3, STRUCTURE_TOWER) == OK) { return true; }
+    else if(this.createConstructionSite(origin.x - 1, origin.y - 3, STRUCTURE_TOWER) == OK) { return true; }
+    else if(this.createConstructionSite(origin.x + 1, origin.y - 3, STRUCTURE_TOWER) == OK) { return true; }
+    else if(this.createConstructionSite(origin.x, origin.y - 4, STRUCTURE_TOWER) == OK) { return true; }
+    else { return false; }
+};
+
+Room.prototype.createBotTower = function()
+{
+    if(this.memory.botExits.length > 0)
+    {
+        let exitPos = this.memory.botExits[Math.floor(this.memory.botExits.length / 2)];
+        let origin = new RoomPosition(exitPos.x, exitPos.y - 5, exitPos.roomName);
+        let ret;
+        for(let i = 0; i < 7; i++)
+        {
+            ret = this.checkAndBuildTower(origin.x + i, origin.y);
+            if(ret == 'built') { return true; }
+            else if(ret == 'exists') { return false; }
+            
+            ret = this.checkAndBuildTower(origin.x - i, origin.y);
+            if(ret == 'built') { return true; }
+            else if(ret == 'exists') { return false; }
+        }
+        for(let i = 0; i < 7; i++)
+        {
+            ret = this.checkAndBuildTower(origin.x + i, origin.y - 1);
+            if(ret == 'built') { return true; }
+            else if(ret == 'exists') { return false; }
+            
+            ret = this.checkAndBuildTower(origin.x - i, origin.y - 1);
+            if(ret == 'built') { return true; }
+            else if(ret == 'exists') { return false; }
+        }
+    }
+    return false;
+};
+
+Room.prototype.createTopTower = function()
+{
+    if(this.memory.topExits.length > 0)
+    {
+        let exitPos = this.memory.topExits[Math.floor(this.memory.topExits.length / 2)];
+        let origin = new RoomPosition(exitPos.x, exitPos.y + 5, exitPos.roomName);
+        let ret;
+        for(let i = 0; i < 7; i++)
+        {
+            ret = this.checkAndBuildTower(origin.x + i, origin.y);
+            if(ret == 'built') { return true; }
+            else if(ret == 'exists') { return false; }
+            
+            ret = this.checkAndBuildTower(origin.x - i, origin.y);
+            if(ret == 'built') { return true; }
+            else if(ret == 'exists') { return false; }
+        }
+        for(let i = 0; i < 7; i++)
+        {
+            ret = this.checkAndBuildTower(origin.x + i, origin.y + 1);
+            if(ret == 'built') { return true; }
+            else if(ret == 'exists') { return false; }
+            
+            ret = this.checkAndBuildTower(origin.x - i, origin.y + 1);
+            if(ret == 'built') { return true; }
+            else if(ret == 'exists') { return false; }
+        }
+    }
+    return false;
+};
+
+Room.prototype.createLeftTower = function()
+{
+    if(this.memory.leftExits.length > 0)
+    {
+        let exitPos = this.memory.leftExits[Math.floor(this.memory.leftExits.length / 2)];
+        let origin = new RoomPosition(exitPos.x + 5, exitPos.y, exitPos.roomName);
+        let ret;
+        for(let i = 0; i < 7; i++)
+        {
+            ret = this.checkAndBuildTower(origin.x, origin.y + i);
+            if(ret == 'built') { return true; }
+            else if(ret == 'exists') { return false; }
+            
+            ret = this.checkAndBuildTower(origin.x, origin.y - i);
+            if(ret == 'built') { return true; }
+            else if(ret == 'exists') { return false; }
+        }
+        for(let i = 0; i < 7; i++)
+        {
+            ret = this.checkAndBuildTower(origin.x + 1, origin.y + i);
+            if(ret == 'built') { return true; }
+            else if(ret == 'exists') { return false; }
+            
+            ret = this.checkAndBuildTower(origin.x + 1, origin.y - i);
+            if(ret == 'built') { return true; }
+            else if(ret == 'exists') { return false; }
+        }
+    }
+        return false;
+};
+
+Room.prototype.createRightTower = function()
+{
+    if(this.memory.rightExits.length > 0)
+    {
+        let exitPos = this.memory.rightExits[Math.floor(this.memory.rightExits.length / 2)];
+        let origin = new RoomPosition(exitPos.x - 5, exitPos.y, exitPos.roomName);
+        let ret;
+        for(let i = 0; i < 7; i++)
+        {
+            ret = this.checkAndBuildTower(origin.x, origin.y + i);
+            if(ret == 'built') { return true; }
+            else if(ret == 'exists') { return false; }
+            
+            ret = this.checkAndBuildTower(origin.x, origin.y - i);
+            if(ret == 'built') { return true; }
+            else if(ret == 'exists') { return false; }
+        }
+        for(let i = 0; i < 7; i++)
+        {
+            ret = this.checkAndBuildTower(origin.x - 1, origin.y + i);
+            if(ret == 'built') { return true; }
+            else if(ret == 'exists') { return false; }
+            
+            ret = this.checkAndBuildTower(origin.x - 1, origin.y - i);
+            if(ret == 'built') { return true; }
+            else if(ret == 'exists') { return false; }
+        }
+    }
+    return false;
+};
+
+Room.prototype.checkAndBuildTower = function(x, y)
+{
+    let results = this.lookForAt(LOOK_STRUCTURES, x, y);
+    if(_.filter(results, function(s) { return s.structureType == STRUCTURE_TOWER; }).length > 0) { return 'exists'; }
+    else if(this.createConstructionSite(x, y, STRUCTURE_TOWER) == OK) { return 'built'; }
+    else { return 'unable'; }
+}
+
+
+
+
 
 
 

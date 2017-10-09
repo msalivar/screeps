@@ -4,10 +4,12 @@ Creep.prototype.doBuild = function()
 {
     if(!this.memory.building) { this.memory.building = false; }
     
-    if(this.memory.building && this.carry[RESOURCE_ENERGY] == 0) {
+    if(this.memory.building && this.carry[RESOURCE_ENERGY] == 0)
+    {
         this.memory.building = false;
     }
-    if(!this.memory.building && this.carry[RESOURCE_ENERGY] >= getMinimum(50, this.carryCapacity * 0.5)) {
+    if(!this.memory.building && this.carry[RESOURCE_ENERGY] >= getMinimum(50, this.carryCapacity * 0.75))
+    {
         this.memory.building = true;
     }
 

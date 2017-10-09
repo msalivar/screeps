@@ -2,10 +2,22 @@
 
 StructureTower.prototype.activate = function()
 {
-    let closestHostile = this.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
-    if(closestHostile)
+    let hostiles = this.room.find(FIND_HOSTILE_CREEPS);
+    let target;
+    let healCount = -1;
+    for(let i in hostiles)
     {
-        this.attack(closestHostile);
+        let count = _.filter(hostiles[i].body, function(bp){return bp == HEAL;}).length;
+        if(count > healCount)
+        {
+            healCount = count;
+            target = hostiles[i];
+        }
+    }
+    //console.log(JSON.stringify(arr, null, 4));
+    if(target)
+    {
+        this.attack(target);
         return;
     }
     

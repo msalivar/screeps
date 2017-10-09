@@ -103,7 +103,7 @@ Room.prototype.initRoads = function()
             {
                 let exit = this.memory.leftExits[Math.floor(this.memory.leftExits.length / 2)];
                 let roadDest = new RoomPosition(exit.x + 2, exit.y, this.name);
-                let exitPos = { pos: roadDest, range: 0 };
+                let exitPos = { pos: roadDest, range: 1 };
                 let results = PathFinder.search(spawn.pos, exitPos, { swampCost: 2});
                 if(!results.incomplete)
                 {
@@ -118,7 +118,7 @@ Room.prototype.initRoads = function()
             {
                 let exit = this.memory.rightExits[Math.floor(this.memory.rightExits.length / 2)];
                 let roadDest = new RoomPosition(exit.x - 2, exit.y, this.name);
-                let exitPos = { pos: roadDest, range: 0 };
+                let exitPos = { pos: roadDest, range: 1 };
                 let results = PathFinder.search(spawn.pos, exitPos, { swampCost: 2});
                 if(!results.incomplete)
                 {
@@ -133,7 +133,7 @@ Room.prototype.initRoads = function()
             {
                 let exit = this.memory.topExits[Math.floor(this.memory.topExits.length / 2)];
                 let roadDest = new RoomPosition(exit.x, exit.y + 2, this.name);
-                let exitPos = { pos: roadDest, range: 0 };
+                let exitPos = { pos: roadDest, range: 1 };
                 let results = PathFinder.search(spawn.pos, exitPos, { swampCost: 2});
                 if(!results.incomplete)
                 {
@@ -148,7 +148,7 @@ Room.prototype.initRoads = function()
             {
                 let exit = this.memory.botExits[Math.floor(this.memory.botExits.length / 2)];
                 let roadDest = new RoomPosition(exit.x, exit.y - 2, this.name);
-                let exitPos = { pos: roadDest, range: 0 };
+                let exitPos = { pos: roadDest, range: 1 };
                 let results = PathFinder.search(spawn.pos, exitPos, { swampCost: 2});
                 if(!results.incomplete)
                 {
@@ -189,9 +189,11 @@ Room.prototype.createStructures = function()
     }
     if (this.controller.level >= 7)
     {
+        this.createConstructionSite(spawn.pos.x + 1, spawn.pos.y - 3, STRUCTURE_SPAWN);
     }
     if (this.controller.level >= 8)
     {
+        this.createConstructionSite(spawn.pos.x - 1, spawn.pos.y - 3, STRUCTURE_SPAWN);
     }
 };
 
@@ -306,7 +308,7 @@ Room.prototype.createWalls = function()
     for(let i = 0; i < leftExits.length; i++)
     {
         let buildRampart = false;
-        if(i == Math.floor(leftExits.length / 2)) { buildRampart = true; }
+        if(i % 3 == 0) { buildRampart = true; }
         let newPos = leftExits[i];
         if(this.buildWall(new RoomPosition(newPos.x, newPos.y, this.name), 2, 0, buildRampart)) { count++; }
         if(nearEnd)
@@ -333,10 +335,7 @@ Room.prototype.createWalls = function()
     for(let i = 0; i < rightExits.length; i++)
     {
         let buildRampart = false;
-        if(i == Math.floor(rightExits.length / 2))
-        {
-            buildRampart = true;
-        }
+        if(i % 3 == 0) { buildRampart = true; }
         let newPos = rightExits[i];
         if(this.buildWall(new RoomPosition(newPos.x, newPos.y, this.name), -2, 0, buildRampart)) { count++; }
         if(nearEnd)
@@ -363,7 +362,7 @@ Room.prototype.createWalls = function()
     for(let i = 0; i < topExits.length; i++)
     {
         let buildRampart = false;
-        if(i == Math.floor(topExits.length / 2)) { buildRampart = true; }
+        if(i % 3 == 0) { buildRampart = true; }
         let newPos = topExits[i];
         if(this.buildWall(new RoomPosition(newPos.x, newPos.y, this.name), 0, 2, buildRampart)) { count++; }
         if(nearEnd)
@@ -390,7 +389,7 @@ Room.prototype.createWalls = function()
     for(let i = 0; i < botExits.length; i++)
     {
         let buildRampart = false;
-        if(i == Math.floor(botExits.length / 2)) { buildRampart = true; }
+        if(i % 3 == 0) { buildRampart = true; }
         let newPos = botExits[i];
         if(this.buildWall(new RoomPosition(newPos.x, newPos.y, this.name), 0, -2, buildRampart)) { count++; }
         if(nearEnd)
@@ -434,9 +433,9 @@ Room.prototype.buildTower = function(origin)
     else if(this.createLeftTower()) { return true; }
     else if(this.createRightTower()) { return true; }
     else if(this.createConstructionSite(origin.x, origin.y + 3, STRUCTURE_TOWER) == OK) { return true; }
-    else if(this.createConstructionSite(origin.x - 1, origin.y - 3, STRUCTURE_TOWER) == OK) { return true; }
-    else if(this.createConstructionSite(origin.x + 1, origin.y - 3, STRUCTURE_TOWER) == OK) { return true; }
     else if(this.createConstructionSite(origin.x, origin.y - 4, STRUCTURE_TOWER) == OK) { return true; }
+    else if(this.createConstructionSite(origin.x, origin.y + 4, STRUCTURE_TOWER) == OK) { return true; }
+    else if(this.createConstructionSite(origin.x, origin.y - 5, STRUCTURE_TOWER) == OK) { return true; }
     else { return false; }
 };
 

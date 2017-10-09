@@ -1,14 +1,14 @@
 Creep.prototype.doLongDistanceHaul = function()
 {
     if(!this.memory.transferred) { this.memory.transferred = 0; }
+    if(this.checkRecycle()) { return; }
     
     let harvestPos = new RoomPosition(this.memory.targetPos.x, this.memory.targetPos.y, this.memory.targetPos.roomName);
     if(this.room.name == this.memory.targetPos.roomName)
     {
         if(this.carry[RESOURCE_ENERGY] >= this.carryCapacity)
         {
-            let pos = new RoomPosition(25, 25, this.memory.homeRoom);
-            this.travelTo(pos);
+            this.moveHome();
         }
         else
         {
@@ -51,7 +51,7 @@ Creep.prototype.doLongDistanceHaul = function()
                 this.travelTo(this.room.storage);
                 if(this.transfer(this.room.storage, RESOURCE_ENERGY) == OK)
                 {
-                    this.memory.transferred = this.memory.transferred + this.carryCapacity;
+                    this.memory.transferred = this.memory.transferred + this.carry[RESOURCE_ENERGY];
                 }
             }
         }

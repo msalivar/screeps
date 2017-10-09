@@ -91,6 +91,7 @@ Room.prototype.init = function()
     if(!this.memory.creeps.repairers) { this.memory.creeps.repairers = 0; }
     if(!this.memory.creeps.upgraders) { this.memory.creeps.upgraders = 0; }
     if(!this.memory.creeps.suppliers) { this.memory.creeps.suppliers = 0; }
+    if(!this.memory.creeps.bouncers) { this.memory.creeps.bouncers = 0; }
 }
 
 Room.prototype.doUpkeep = function()

@@ -12,6 +12,7 @@ Creep.prototype.doRepair = function()
     {
         this.memory.repairing = true;
         
+        if(this.room.name != this.memory.homeRoom) { this.moveHome(); return; }
         this.memory.target = this.room.findRepairTarget();
         this.memory.repairCount = 0;
     }
@@ -32,7 +33,8 @@ Creep.prototype.doRepair = function()
             }
         }
         else if (target.hits == target.hitsMax)
-        { 
+        {
+            if(this.room.name != this.memory.homeRoom) { this.moveHome(); return; }
             this.memory.target = this.room.findRepairTarget();
             this.memory.repairCount = 0;
         }
@@ -48,6 +50,7 @@ Creep.prototype.doRepair = function()
             if(!this.memory.repairCount) { this.memory.repairCount = 0; }
             if(this.memory.repairCount >= 25)
             {
+                if(this.room.name != this.memory.homeRoom) { this.moveHome(); return; }
                 this.memory.target = this.room.findRepairTarget();
                 this.memory.repairCount = 0;
             }

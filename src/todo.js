@@ -1,7 +1,4 @@
-long distance - if attacked, recycle?
-guard creeps for reserved rooms?
-guard creeps for nearby hostile rooms?
-build rampart in middle of each exit segment
+have bouncers sit in unoccupied ramparts nearest hostiles 
 build rampart instead of wall if within 2? of wall terrain
 if there is a harvest container, use max range on dropped resources
 min/max energy ratio for creep spawns & get energy resources in room dropped/container

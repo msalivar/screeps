@@ -2,44 +2,54 @@
 
 Creep.prototype.run = function()
 {
-    switch(this.memory.role)
+    try
     {
-        case 'harvester':
-            this.doHarvest();
-            break;
-        case 'upgrader':
-            this.doUpgrade();
-            break;
-        case 'builder':
-            this.doBuild();
-            break;
-        case 'repairer':
-            this.doRepair();
-            break;
-        case 'hauler':
-            this.doHaul();
-            break;
-        case 'miner':
-            this.doMine();
-            break;
-        case 'supplier':
-            this.doSupply();
-            break;
-        case 'scout':
-            this.doScout();
-            break;
-        case 'longDistanceHarvester':
-            this.doLongDistanceHarvest();
-            break;
-        case 'longDistanceHauler':
-            this.doLongDistanceHaul();
-            break;
-        case 'claimer':
-            this.doClaim();
-            break;
-        default:
-            console.log('ERROR: Creep ' + this.name + ' does not have a role.');
-            break;
+        switch(this.memory.role)
+        {
+            case 'harvester':
+                this.doHarvest();
+                break;
+            case 'upgrader':
+                this.doUpgrade();
+                break;
+            case 'builder':
+                this.doBuild();
+                break;
+            case 'repairer':
+                this.doRepair();
+                break;
+            case 'hauler':
+                this.doHaul();
+                break;
+            case 'miner':
+                this.doMine();
+                break;
+            case 'supplier':
+                this.doSupply();
+                break;
+            case 'scout':
+                this.doScout();
+                break;
+            case 'longDistanceHarvester':
+                this.doLongDistanceHarvest();
+                break;
+            case 'longDistanceHauler':
+                this.doLongDistanceHaul();
+                break;
+            case 'claimer':
+                this.doClaim();
+                break;
+            case 'bouncer':
+                this.doBounce();
+                break;
+            default:
+                console.log('ERROR: Creep ' + this.name + ' does not have a role.');
+                break;
+        }
+    }
+    catch(ex)
+    {
+        console.log('Creep action error - Role: ' + this.memory.role + ' Exception: ' + ex.toString());
     }
 };
 
@@ -64,7 +74,7 @@ Creep.prototype.getEnergy = function()
         }
         else
         {
-            if (source && this.pos.getRangeTo(source.pos) <= 5)
+            if (source && this.pos.getRangeTo(source.pos) <= 15)
             {
                 if(this.pickup(source) == ERR_NOT_IN_RANGE)
                 {
@@ -96,6 +106,17 @@ Creep.prototype.getEnergy = function()
     
     return this.withdrawFromStorage();
 };
+
+Creep.prototype.moveHome = function()
+{
+    if(this.memory.homeRoom)
+    {
+        let pos = new RoomPosition(25, 25, this.memory.homeRoom);
+        this.travelTo(pos);
+        return true;
+    }
+    return false;
+}
 
 Creep.prototype.findSource = function()
 {
@@ -129,8 +150,10 @@ Creep.prototype.withdrawFromStorage = function()
 
 Creep.prototype.checkRecycle = function()
 {
-    if (this.ticksToLive <= 60)
+    if (this.ticksToLive <= 80)
     {
+        if(this.room.name != this.memory.homeRoom) { this.moveHome(); return true; }
+    
         let spawn = Game.getObjectById(this.room.memory.spawn);
         if (spawn)
         {
@@ -138,8 +161,8 @@ Creep.prototype.checkRecycle = function()
             {
                 this.travelTo(spawn.pos, { ignoreCreeps: false });
             }
-            return true;
         }
+        return true;
     }
     return false;
 }

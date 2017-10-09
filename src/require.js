@@ -2,6 +2,7 @@ require('Traveler');
 require('config');
 require('properties');
 require('role.claimer');
+require('role.bouncer');
 require('role.builder');
 require('role.harvester');
 require('role.hauler');

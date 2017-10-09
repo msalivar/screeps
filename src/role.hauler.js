@@ -3,12 +3,13 @@
 Creep.prototype.doHaul = function()
 {
     if (this.checkRecycle()) { return; }
+    if(this.room.name != this.memory.homeRoom) { this.moveHome(); return; }
     
     if(this.memory.hauling && this.carry[RESOURCE_ENERGY] == 0)
     {
         this.memory.hauling = false;
     }
-    if(!this.memory.hauling && this.carry[RESOURCE_ENERGY] >= getMaximum(50, this.carryCapacity * 0.5))
+    if(!this.memory.hauling && this.carry[RESOURCE_ENERGY] >= getMaximum(50, this.carryCapacity * 0.7))
     {
         this.memory.hauling = true;
     }
@@ -17,7 +18,7 @@ Creep.prototype.doHaul = function()
     {
         if(this.room.memory.defConMode == 'active')
         {
-            if (this.findTower(400)) { return; }
+            if (this.findTower(500)) { return; }
             if (this.findSpawnOrExtension()) { return; }
             if (this.findStorage()) { return; }
             return;
@@ -34,11 +35,12 @@ Creep.prototype.doHaul = function()
         if (this.findStorage()) { return; }
         
         // Go home
-        let spawns = this.room.find(FIND_MY_SPAWNS);
-        if(!this.pos.isNearTo(spawns[0]))
-        {
-            this.travelTo(spawns[0]);
-        }
+        this.moveRandom();
+        // let spawns = this.room.find(FIND_MY_SPAWNS);
+        // if(!this.pos.isNearTo(spawns[0]))
+        // {
+        //     this.travelTo(spawns[0]);
+        // }
     }
     else
     {

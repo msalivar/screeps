@@ -30,15 +30,16 @@ Creep.prototype.doLongDistanceHarvest = function()
             if(container.length > 0 && container[0].hits < container[0].hitsMax)
             {
                 this.repairHarvestContainer(container[0]);
+                return;
             }
             
             if(!this.pos.isEqualTo(harvestPos))
             {
-                this.travelTo(harvestPos);
+                this.travelTo(harvestPos, { ignoreCreeps: false });
             }
             
             this.harvest(Game.getObjectById(this.memory.target));
-            if(checkIfBuildable(harvestPos)) { this.room.createConstructionSite(harvestPos, STRUCTURE_CONTAINER); }
+            if(!container.length && checkIfBuildable(harvestPos)) { this.room.createConstructionSite(harvestPos, STRUCTURE_CONTAINER); }
         }
     }
     else
@@ -63,8 +64,7 @@ Creep.prototype.buildHarvestContainer = function(site)
     {
         if(this.pos.isEqualTo(site.pos))
         {
-            let pos = new RoomPosition(25, 25, this.memory.homeRoom);
-            this.travelTo(pos);
+            this.moveHome();
         }
         else
         {
@@ -101,8 +101,7 @@ Creep.prototype.repairHarvestContainer = function(container)
     {
         if(this.pos.isEqualTo(container.pos))
         {
-            let pos = new RoomPosition(25, 25, this.memory.homeRoom);
-            this.travelTo(pos);
+            this.moveHome();
         }
         else
         {

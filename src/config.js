@@ -5,7 +5,7 @@ global.config =
     options:
     {
         reportControllerUpgrade: false,
-        scoutTimer: 400,
+        scoutTimer: 300,
         minWallHits: 1000000
     }
 };

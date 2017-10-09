@@ -1,5 +1,3 @@
-
-
 cleanCreepMemory = function()
 {
     for (let name in Memory.creeps)
@@ -11,25 +9,25 @@ cleanCreepMemory = function()
                 case 'harvester':
                     Memory.sources[Memory.creeps[name].target].harvester = 'none';
                     //console.log(Memory.creeps[name].homeRoom);
-                    Game.rooms[Memory.creeps[name].homeRoom].memory.creeps.harvesters--;
+                    Memory.rooms[Memory.creeps[name].homeRoom].creeps.harvesters--;
                     break;
                 case 'hauler':
-                    Game.rooms[Memory.creeps[name].homeRoom].memory.creeps.haulers--;
+                    Memory.rooms[Memory.creeps[name].homeRoom].creeps.haulers--;
                     break;
                 case 'builder':
-                    Game.rooms[Memory.creeps[name].homeRoom].memory.creeps.builders--;
+                    Memory.rooms[Memory.creeps[name].homeRoom].creeps.builders--;
                     break;
                 case 'repairer':
-                    Game.rooms[Memory.creeps[name].homeRoom].memory.creeps.repairers--;
+                    Memory.rooms[Memory.creeps[name].homeRoom].creeps.repairers--;
                     break;
                 case 'upgrader':
-                    Game.rooms[Memory.creeps[name].homeRoom].memory.creeps.upgraders--;
+                    Memory.rooms[Memory.creeps[name].homeRoom].creeps.upgraders--;
                     break;
                 case 'supplier':
-                    Game.rooms[Memory.creeps[name].homeRoom].memory.creeps.suppliers--;
+                    Memory.rooms[Memory.creeps[name].homeRoom].creeps.suppliers--;
                     break;
                 case 'miner':
-                    Game.rooms[Memory.creeps[name].homeRoom].memory.creeps.miners--;
+                    Memory.rooms[Memory.creeps[name].homeRoom].creeps.miners--;
                     break;
                 case 'longDistanceHarvester':
                     Memory.sources[Memory.creeps[name].target].longHarvester = 'none';
@@ -40,6 +38,9 @@ cleanCreepMemory = function()
                     break;
                 case 'claimer':
                     Memory.rooms[Memory.creeps[name].target].neighborData.claimer = 'none';
+                    break;
+                case 'bouncer':
+                    Memory.rooms[Memory.creeps[name].target].creeps.bouncers--;
                     break;
                 default:
                     break;

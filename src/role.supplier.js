@@ -29,11 +29,12 @@ Creep.prototype.doSupply = function()
         // }
         
         // Go home
-        let spawns = this.room.find(FIND_MY_SPAWNS);
-        if(!this.pos.isNearTo(spawns[0]))
-        {
-            this.travelTo(spawns[0]);
-        }
+        //this.moveRandom();
+        // let spawns = this.room.find(FIND_MY_SPAWNS);
+        // if(!this.pos.isNearTo(spawns[0]))
+        // {
+        //     this.travelTo(spawns[0]);
+        // }
     }
     else
     {

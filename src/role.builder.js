@@ -2,6 +2,8 @@
 
 Creep.prototype.doBuild = function()
 {
+    if(this.room.name != this.memory.homeRoom) { this.moveHome(); return; }
+    
     if(!this.memory.building) { this.memory.building = false; }
     
     if(this.memory.building && this.carry[RESOURCE_ENERGY] == 0)

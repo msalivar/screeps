@@ -51,10 +51,10 @@ StructureSpawn.prototype.doSpawn = function(room)
     {
         haulersNeeded -= 1;
     }
-    if(room.memory.storage && getContainerEnergy(room) >= 1400 * room.memory.sources.length) { haulersNeeded++; }
+    if(!room.storage && getContainerEnergy(room) >= 1800 * room.memory.sources.length) { haulersNeeded++; }
     if(room.memory.creeps.haulers < haulersNeeded)
     {
-        let ret = this.createHauler(getMaximum(getMinimum(room.energyCapacityAvailable * 0.6, 750), 150));
+        let ret = this.createHauler(getMaximum(getMinimum(room.energyCapacityAvailable * 0.6, 1200), 150));
         if(ret == OK)
         {
             room.memory.creeps.haulers++;
@@ -96,7 +96,18 @@ StructureSpawn.prototype.doSpawn = function(room)
         return;
     }
     
-    // If defcon is active, stop here
+    if(room.memory.defConMode == 'active' && room.memory.creeps.bouncers < 1)
+    {
+        let ret = this.createBouncer(room.energyCapacityAvailable * 0.6, room.name);
+        if(ret == OK)
+        {
+            room.memory.creeps.bouncers++;
+            return;
+        }
+        else if(ret != ERR_NOT_ENOUGH_ENERGY) { console.log('Error spawning bouncer: ' + ret); }
+    }
+            
+    //// If defcon is active, stop here ////
     if(room.memory.defConMode == 'active') { return; }
     
     // Check builders
@@ -108,7 +119,7 @@ StructureSpawn.prototype.doSpawn = function(room)
     
     if(sites.length > 0 && room.memory.creeps.builders < maxBuilders)
     {
-        let ret = this.createGeneric(room.energyCapacityAvailable, 'builder');
+        let ret = this.createGeneric(getMinimum(room.energyCapacityAvailable * 0.75, 2000), 'builder');
         if(ret == OK)
         {
             room.memory.creeps.builders++;
@@ -120,9 +131,7 @@ StructureSpawn.prototype.doSpawn = function(room)
     // Check upgraders
     if(room.controller.level >= 5 && Game.getObjectById(room.memory.controllerLink) && Game.getObjectById(room.memory.spawnLink))
     {
-        let maxUpgraders = 1
-        if(room.memory.energyConMode >= 5) { maxUpgraders++; }
-        if(room.memory.creeps.upgraders < maxUpgraders)
+        if(room.memory.creeps.upgraders < 1)
         {
             let ret = this.createLinkUpgrader(room.energyCapacityAvailable);
             if(ret == OK)
@@ -181,26 +190,42 @@ StructureSpawn.prototype.doSpawn = function(room)
     {
         for(let name of this.room.memory.exitRooms)
         {
-            if(!Memory.rooms[name].neighborData.hostile)
+            if(!Memory.rooms[name].neighborData.hostile && (!Game.rooms[name] || !Game.rooms[name].controller || !Game.rooms[name].controller.my))
             {
-                // Spawn claimer
-                if(room.memory.energyConMode >= 2 && !Memory.rooms[name].neighborData.claimedByMe)
+                if(room.memory.energyConMode >= 2)
                 {
                     // Spawn claimers
                     if(Memory.rooms[name].neighborData.claimer == 'none')
                     {
-                        let ret = this.createClaimer(getMaximum(room.energyCapacityAvailable * 0.5, 1300), name);
-                        if(ret == OK)
+                        let needClaimer = true;
+                        if(Game.rooms[name] && Game.rooms[name].controller && Game.rooms[name].controller.reservation.ticksToEnd > 3500) { needClaimer = false; }
+                        if(needClaimer)
                         {
-                            Memory.rooms[name].neighborData.claimer = 'active';
-                            return;
+                            let ret = this.createClaimer(getMaximum(room.energyCapacityAvailable * 0.5, 1300), name);
+                            if(ret == OK)
+                            {
+                                Memory.rooms[name].neighborData.claimer = 'active';
+                                return;
+                            }
+                            else if(ret != ERR_NOT_ENOUGH_ENERGY) { console.log('Error spawning claimer: ' + ret); }
                         }
-                        else if(ret != ERR_NOT_ENOUGH_ENERGY) { console.log('Error spawning claimer: ' + ret); }
                     }
                 }
                 
                 // Spawn long distance crew
                 if(this.tryCreateLongDistance(name)) { return; }
+            }
+            
+            // Spawn bouncer
+            if(Memory.rooms[name].neighborData.hostile && Memory.rooms[name].creeps.bouncers < 1)
+            {
+                let ret = this.createBouncer(room.energyCapacityAvailable * 0.2, name);
+                if(ret == OK)
+                {
+                    Memory.rooms[name].creeps.bouncers++;
+                    return;
+                }
+                else if(ret != ERR_NOT_ENOUGH_ENERGY) { console.log('Error spawning bouncer: ' + ret); }
             }
         }
     }
@@ -212,7 +237,7 @@ StructureSpawn.prototype.tryCreateLongDistance = function(roomName)
     {
         if(!Memory.sources[source].longHarvester || Memory.sources[source].longHarvester == 'none')
         {
-            let ret = this.createLongDistanceHarvester(getMaximum(getMinimum(this.room.energyCapacityAvailable * 0.7, 1000), 400), source, Memory.sources[source].harvestPos);
+            let ret = this.createLongDistanceHarvester(getMaximum(getMinimum(this.room.energyCapacityAvailable, 1000), 400), source, Memory.sources[source].harvestPos);
             if(ret == OK)
             {
                 Memory.sources[source].longHarvester = 'active';
@@ -222,7 +247,7 @@ StructureSpawn.prototype.tryCreateLongDistance = function(roomName)
         }
         if(!Memory.sources[source].longHauler || Memory.sources[source].longHauler == 'none')
         {
-            let ret = this.createLongDistanceHauler(getMaximum(this.room.energyCapacityAvailable * 0.8, 950), source, Memory.sources[source].harvestPos);
+            let ret = this.createLongDistanceHauler(getMaximum(this.room.energyCapacityAvailable, 950), source, Memory.sources[source].harvestPos);
             if(ret == OK)
             {
                 Memory.sources[source].longHauler = 'active';
@@ -311,6 +336,7 @@ StructureSpawn.prototype.createLinkUpgrader = function(energy)
     if(this.room.memory.energyConMode >= 2) { workMax += 3; }
     if(this.room.memory.energyConMode >= 3) { workMax += 5; }
     if(this.room.memory.energyConMode >= 4) { workMax += 5; }
+    if(this.room.memory.energyConMode >= 5) { workMax += 10; }
     if(this.room.controller.level >= 8 && workMax > 15) { workMax = 15; }
     while(totalEnergy <= energy - 300 && workCount < workMax)
     {
@@ -361,35 +387,6 @@ StructureSpawn.prototype.createSupplier = function(energy)
     return this.spawnCreep(mods, name, { memory: {role: 'supplier', hauling: false} });
 };
 
-// StructureSpawn.prototype.createLongDistanceMiner = function(energy, targetSource, targetRoom)
-// {
-//     let numberOfParts = getMinimum(Math.floor(energy / 600), 5);
-//     let mods = [];
-    
-//     for(let i = 0; i < numberOfParts; i++)
-//     {
-//         mods.push(WORK);
-//         mods.push(WORK);
-//     }
-//     for(let i = 0; i < numberOfParts; i++)
-//     {
-//         mods.push(CARRY);
-//         mods.push(CARRY);
-//         mods.push(CARRY);
-//     }
-//     for(let i = 0; i < numberOfParts; i++)
-//     {
-//         mods.push(MOVE);
-//         mods.push(MOVE);
-//         mods.push(MOVE);
-//         mods.push(MOVE);
-//         mods.push(MOVE);
-//     }
-    
-//     let name = 'longMiner-' + generateRandomId();
-//     return this.spawnCreep(mods, name, { memory: {role: 'longDistanceMiner', target: targetSource, destination: targetRoom} });
-// };
-
 StructureSpawn.prototype.createLongDistanceHarvester = function(energy, targetSource, harvestPos)
 {
     let numberOfParts = getMinimum(Math.floor((energy - 250) / 150), 5);
@@ -412,19 +409,19 @@ StructureSpawn.prototype.createLongDistanceHarvester = function(energy, targetSo
 
 StructureSpawn.prototype.createLongDistanceHauler = function(energy, targetSource, harvestPos)
 {
-    let numberOfParts = getMinimum(Math.floor((energy - 150) / 200), 12);
+    let numberOfParts = getMinimum(Math.floor(energy / 200), 10);
     let mods = [];
     
     for(let i = 0; i < numberOfParts; i++)
     {
         mods.push(CARRY);
-        mods.push(CARRY);
         mods.push(MOVE);
+        mods.push(CARRY);
         mods.push(MOVE);
     }
     
-    mods.push(WORK);
-    mods.push(MOVE);
+    // mods.push(WORK);
+    // mods.push(MOVE);
     
     let name = 'longHauler-' + generateRandomId();
     return this.spawnCreep(mods, name, { memory: {role: 'longDistanceHauler', hauling: false, target: targetSource, targetPos: harvestPos} });
@@ -432,15 +429,17 @@ StructureSpawn.prototype.createLongDistanceHauler = function(energy, targetSourc
 
 StructureSpawn.prototype.createClaimer = function(energy, targetRoom)
 {
-    let numberOfParts = getMinimum(Math.floor((energy - 650) / 650), 1);
+    let numberOfParts = getMinimum(Math.floor((energy - 1300) / 650), 5);
     let mods = [];
     
     mods.push(MOVE);
+    mods.push(CLAIM);
+    mods.push(MOVE);
+    mods.push(CLAIM);
     for(let i = 0; i < numberOfParts; i++)
     {
         mods.push(MOVE);
     }
-    mods.push(CLAIM);
     for(let i = 0; i < numberOfParts; i++)
     {
         mods.push(CLAIM);
@@ -450,7 +449,27 @@ StructureSpawn.prototype.createClaimer = function(energy, targetRoom)
     return this.spawnCreep(mods, name, { memory: {role: 'claimer', target: targetRoom} });
 };
 
-
+StructureSpawn.prototype.createBouncer = function(energy, targetRoom)
+{
+    let numberOfParts = getMinimum(Math.floor(energy / 250), 8);
+    let mods = [];
+    
+    for(let i = 0; i < numberOfParts; i++)
+    {
+        mods.push(TOUGH);
+        mods.push(MOVE);
+        mods.push(TOUGH);
+        mods.push(MOVE);
+    }
+    for(let i = 0; i < numberOfParts; i++)
+    {
+        mods.push(ATTACK);
+        mods.push(MOVE);
+    }
+    
+    let name = 'bouncer-' + generateRandomId();
+    return this.spawnCreep(mods, name, { memory: {role: 'bouncer', target: targetRoom} });
+};
 
 
 

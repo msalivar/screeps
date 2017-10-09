@@ -2,23 +2,7 @@
 
 Room.prototype.checkRoom = function()
 {
-    if (!this.memory.spawn)
-    {
-        var spawns = this.find(FIND_MY_SPAWNS);
-        if (spawns.length) { this.memory.spawn = spawns[0].id; }
-    }
-    
-    if (!this.memory.sources)
-    {
-        this.memory.sources = [];
-        var sources = this.find(FIND_SOURCES);
-        for (let source of sources)
-        {
-            this.memory.sources.push(source.id);
-            source.memory.harvester = 'none';
-            source.memory.harvestPos = findConstructionSite(source, this.name);
-        }
-    }
+    this.init();
     
     // From here onwards is for neighboring rooms only
     if(!this.memory.neighborData) { this.memory.neighborData = {}; }
@@ -26,7 +10,6 @@ Room.prototype.checkRoom = function()
     if(this.controller)
     {
         this.memory.neighborData.hostileControlled = (this.controller.level > 0 && !this.controller.my);
-        this.memory.neighborData.claimedByMe = this.controller.level > 0 && this.controller.my;
     }
     
     let enemyCreeps = this.find(FIND_HOSTILE_CREEPS);

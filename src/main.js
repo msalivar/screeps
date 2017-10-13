@@ -6,13 +6,7 @@ module.exports.loop = function ()
 {
     cleanCreepMemory();
     
-    // Process creeps
-    for(let name in Game.creeps)
-    {
-        let creep = Game.creeps[name];
-        if(!creep.memory.homeRoom) { creep.memory.homeRoom = creep.pos.roomName; }
-        creep.run();
-    }
+    processFlags();
     
     // Process rooms and their structures
     for(let name in Game.rooms)
@@ -27,5 +21,13 @@ module.exports.loop = function ()
         {
             room.checkRoom();
         }
+    }
+    
+    // Process creeps
+    for(let name in Game.creeps)
+    {
+        let creep = Game.creeps[name];
+        if(!creep.memory.homeRoom) { creep.memory.homeRoom = creep.pos.roomName; }
+        creep.run();
     }
 };

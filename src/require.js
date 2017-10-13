@@ -8,6 +8,7 @@ require('role.harvester');
 require('role.hauler');
 require('role.longDistanceHarvester');
 require('role.longDistanceHauler');
+require('role.longDistanceBuilder');
 require('role.miner');
 require('role.repairer');
 require('role.scout');

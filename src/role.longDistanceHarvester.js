@@ -10,24 +10,25 @@ Creep.prototype.doLongDistanceHarvest = function()
         let results;
         
         results = this.room.lookForAt(LOOK_CONSTRUCTION_SITES, harvestPos);
-        if(results.length)
+        if(results && results.length)
         {
             site = _.filter(results, function(s) { return s.structureType == STRUCTURE_CONTAINER });
         }
         
-        if(site)
+        if(site && site.length > 0)
         {
             this.buildHarvestContainer(site[0]);
+            return;
         }
         else
         {
             results = this.room.lookForAt(LOOK_STRUCTURES, harvestPos);
-            if(results.length)
+            if(results && results.length)
             {
                 container = _.filter(results, function(c) { return c.structureType == STRUCTURE_CONTAINER && c.hits < c.hitsMax });
             }
             
-            if(container.length > 0 && container[0].hits < container[0].hitsMax)
+            if(container && container.length > 0 && container[0].hits < container[0].hitsMax)
             {
                 this.repairHarvestContainer(container[0]);
                 return;
@@ -36,10 +37,11 @@ Creep.prototype.doLongDistanceHarvest = function()
             if(!this.pos.isEqualTo(harvestPos))
             {
                 this.travelTo(harvestPos, { ignoreCreeps: false });
+                return;
             }
             
             this.harvest(Game.getObjectById(this.memory.target));
-            if(!container.length && checkIfBuildable(harvestPos)) { this.room.createConstructionSite(harvestPos, STRUCTURE_CONTAINER); }
+            if(!container && checkIfBuildable(harvestPos)) { this.room.createConstructionSite(harvestPos, STRUCTURE_CONTAINER); }
         }
     }
     else

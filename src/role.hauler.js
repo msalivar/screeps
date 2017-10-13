@@ -31,11 +31,12 @@ Creep.prototype.doHaul = function()
             if (this.findLink(800)) { return; }
         }
         
-        if (this.findLink(800)) { return; }
-        if (this.findStorage()) { return; }
+        if(this.findLink(800)) { return; }
+        if(this.room.energyAvailable < this.room.energyCapacityAvailable * 0.5 && this.findSpawnOrExtension()) { return; }
+        if(this.findStorage()) { return; }
         
         // Go home
-        this.moveRandom();
+        //this.moveRandom();
         // let spawns = this.room.find(FIND_MY_SPAWNS);
         // if(!this.pos.isNearTo(spawns[0]))
         // {
@@ -52,7 +53,7 @@ Creep.prototype.findStorage = function(threshold)
 {
     if(this.room.storage)
     {
-        this.travelTo(this.room.storage);
+        this.travelTo(this.room.storage, { ignoreCreeps: false });
         this.transfer(this.room.storage, RESOURCE_ENERGY);
         return true;
     }

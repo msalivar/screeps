@@ -2,6 +2,11 @@
 
 Creep.prototype.doSupply = function()
 {
+    if(this.carry[RESOURCE_ENERGY] < this.carryCapacity && this.room.storage && this.pos.isNearTo(this.room.storage))
+    {
+        this.withdraw(this.room.storage, RESOURCE_ENERGY);
+    }
+    
     if(this.memory.hauling && this.carry[RESOURCE_ENERGY] <= getMaximum(50, this.carryCapacity * 0.2))
     {
         this.memory.hauling = false;
@@ -10,7 +15,7 @@ Creep.prototype.doSupply = function()
     {
         this.memory.hauling = true;
     }
-    
+        
     if(this.memory.hauling)
     {
         if(this.room.memory.defConMode == 'active')

@@ -1,9 +1,12 @@
+make claimers not spawn for no controller rooms
+let room process repair targets into array, then repairers pick targets and pop from array
 have bouncers sit in unoccupied ramparts nearest hostiles 
 build rampart instead of wall if within 2? of wall terrain
 if there is a harvest container, use max range on dropped resources
 min/max energy ratio for creep spawns & get energy resources in room dropped/container
 improve spawner code
 change getEnergy stuff to only search in room
+long distance hauler and harvester might freeze if not in target room or home room
 creeps move to home room if not in it
 source links?
 creeps reserve neighbor rooms and make a spawn there

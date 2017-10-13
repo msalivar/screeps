@@ -18,24 +18,27 @@ Creep.prototype.doClaim = function()
             return;
         }
         
-        if(this.room.controller.my)
+        if(!this.room.controller || this.room.controller.my)
         {
             this.memory.target = this.memory.homeRoom;
             return;
         }
         
-        // if(this.room.memory.sources.length >= 2 && ableToClaimRoom())
-        // {
-        //     let ret = this.claimController(this.room.controller);
-        //     if(ret == OK)
-        //     {
-        //         return;
-        //     }
-        //     else if(ret == ERR_NOT_IN_RANGE)
-        //     {
-        //         this.travelTo(this.room.controller.pos);
-        //     }
-        // }
+        if(this.memory.colonize)
+        {
+            if(this.room.memory.sources.length >= 2 && ableToClaimRoom())
+            {
+                let ret = this.claimController(this.room.controller);
+                if(ret == OK)
+                {
+                    return;
+                }
+                else if(ret == ERR_NOT_IN_RANGE)
+                {
+                    this.travelTo(this.room.controller.pos);
+                }
+            }
+        }
         
         let ret = this.reserveController(this.room.controller);
         if(ret == ERR_NOT_IN_RANGE)

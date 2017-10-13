@@ -14,7 +14,7 @@ Creep.prototype.doRepair = function()
         
         if(this.room.name != this.memory.homeRoom) { this.moveHome(); return; }
         this.memory.target = this.room.findRepairTarget();
-        this.memory.repairCount = 0;
+        //this.memory.repairCount = 0;
     }
     
     if(this.memory.repairing)
@@ -36,7 +36,7 @@ Creep.prototype.doRepair = function()
         {
             if(this.room.name != this.memory.homeRoom) { this.moveHome(); return; }
             this.memory.target = this.room.findRepairTarget();
-            this.memory.repairCount = 0;
+            //this.memory.repairCount = 0;
         }
     
         let ret = this.repair(target);
@@ -46,14 +46,16 @@ Creep.prototype.doRepair = function()
         }
         else if(ret == OK)
         {
-            this.memory.repairCount++;
-            if(!this.memory.repairCount) { this.memory.repairCount = 0; }
-            if(this.memory.repairCount >= 25)
-            {
-                if(this.room.name != this.memory.homeRoom) { this.moveHome(); return; }
-                this.memory.target = this.room.findRepairTarget();
-                this.memory.repairCount = 0;
-            }
+            if(!this.pos.isNearTo(target) && this.room.memory.defConMode == 'inactive') { this.travelTo(target); }
+            
+            // this.memory.repairCount++;
+            // if(!this.memory.repairCount) { this.memory.repairCount = 0; }
+            // if(this.memory.repairCount >= 25)
+            // {
+            //     if(this.room.name != this.memory.homeRoom) { this.moveHome(); return; }
+            //     this.memory.target = this.room.findRepairTarget();
+            //     this.memory.repairCount = 0;
+            // }
         }
     }
     else if (this.carry[RESOURCE_ENERGY] < this.carryCapacity)

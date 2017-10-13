@@ -36,6 +36,9 @@ Creep.prototype.run = function()
             case 'longDistanceHauler':
                 this.doLongDistanceHaul();
                 break;
+            case 'longDistanceBuilder':
+                this.doLongDistanceBuild();
+                break;
             case 'claimer':
                 this.doClaim();
                 break;
@@ -87,7 +90,7 @@ Creep.prototype.getEnergy = function()
         let limit = getMinimum(this.carryCapacity, 100);
         if (this.memory.role == 'hauler')
         {
-            limit = this.carryCapacity * 0.3;
+            limit = this.carryCapacity * 0.5;
         }
         let container = this.pos.findClosestByRange(FIND_STRUCTURES,
         {

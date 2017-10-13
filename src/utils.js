@@ -34,10 +34,24 @@ cleanCreepMemory = function()
                     break;
                 case 'longDistanceHauler':
                     Memory.sources[Memory.creeps[name].target].longHauler = 'none';
-                    console.log('Long distance hauler expired - Transferred: ' + Memory.creeps[name].transferred + ' Target: ' + Memory.creeps[name].target);
+                    if(global.config.options.reportLongDistanceHauling)
+                    {
+                        console.log('Long distance hauler expired - Transferred: ' + 
+                                    Memory.creeps[name].transferred + ' Target: ' +
+                                    Memory.creeps[name].target);
+                    }
+                    break;
+                case 'longDistanceBuilder':
+                    Memory.rooms[Memory.creeps[name].target].creeps.longBuilders--;
                     break;
                 case 'claimer':
-                    Memory.rooms[Memory.creeps[name].target].neighborData.claimer = 'none';
+                    // TODO: Fix these, not working
+                    if(Memory.rooms[Memory.creeps[name].target].neighborData)
+                    {
+                        Memory.rooms[Memory.creeps[name].target].neighborData.claimer = 'none';
+                    }
+                    //console.log(Memory.creeps[name].colonize + ' ' + Memory.rooms[Memory.creeps[name].target].colonizing);
+                    if(Memory.creeps[name].colonize) { Memory.rooms[Memory.creeps[name].target].colonizing = false; }
                     break;
                 case 'bouncer':
                     Memory.rooms[Memory.creeps[name].target].creeps.bouncers--;
@@ -48,6 +62,32 @@ cleanCreepMemory = function()
             delete Memory.creeps[name];
         }
     }  
+};
+
+processFlags = function()
+{
+    let allFlags = Object.keys(Game.flags);
+    for(let it of allFlags)
+    {
+        let flag = Game.flags[it];
+        switch(flag.color)
+        {
+            case COLOR_GREEN:
+                try
+                {
+                    if(flag.room)
+                    {
+                        if(flag.room.find(FIND_MY_SPAWNS).length > 0) { flag.remove(); }
+                        else { flag.room.createConstructionSite(flag.pos, STRUCTURE_SPAWN); }
+                    }
+                }
+                catch(ex) { console.log('Error processing green flag: ' + ex.toString()); }
+                break;
+            default:
+                //flag.remove();
+                break;
+        }
+    }
 };
 
 getContainerEnergy = function(room)

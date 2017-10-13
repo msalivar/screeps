@@ -8,13 +8,12 @@ StructureTower.prototype.activate = function()
     for(let i in hostiles)
     {
         let count = _.filter(hostiles[i].body, function(bp){return bp == HEAL;}).length;
-        if(count > healCount)
+        if(count >= healCount)
         {
             healCount = count;
             target = hostiles[i];
         }
     }
-    //console.log(JSON.stringify(arr, null, 4));
     if(target)
     {
         this.attack(target);
@@ -43,18 +42,5 @@ StructureTower.prototype.activate = function()
             this.repair(lowStructure);
             return;
         }
-        
-        // lowStructures = this.room.find(FIND_MY_STRUCTURES,
-        // {
-        //     filter: (structure) => (structure.hits < structure.hitsMax 
-        //                             && structure.structureType != STRUCTURE_RAMPART
-        //                             && structure.structureType != STRUCTURE_CONTAINER)
-        // });
-        // if (lowStructures.length > 0)
-        // {
-        //     let lowStructure = _.min(lowStructures, _.property('hits'));
-        //     this.repair(lowStructure);
-        //     return;
-        // }
     }
 };

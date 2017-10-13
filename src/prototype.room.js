@@ -92,6 +92,7 @@ Room.prototype.init = function()
     if(!this.memory.creeps.upgraders) { this.memory.creeps.upgraders = 0; }
     if(!this.memory.creeps.suppliers) { this.memory.creeps.suppliers = 0; }
     if(!this.memory.creeps.bouncers) { this.memory.creeps.bouncers = 0; }
+    if(!this.memory.creeps.longBuilders) { this.memory.creeps.longBuilders = 0; }
 }
 
 Room.prototype.doUpkeep = function()
@@ -281,6 +282,53 @@ Room.prototype.getNumRepairTargets = function()
     });
     return damagedStructures.length ? damagedStructures.length : 0;
 };
+
+Room.prototype.tryColonize = function(spawn)
+{
+    if(this.memory.energyConMode < 3) { return false; }
+    
+    let allFlags = Object.keys(Game.flags);
+    for(let it of allFlags)
+    {
+        let flag = Game.flags[it];
+        if(flag.color == COLOR_GREEN)
+        {
+            if(ableToClaimRoom() && !Memory.rooms[flag.pos.roomName].colonizing && (!flag.room || !flag.room.controller))
+            {
+                let ret = spawn.createClaimer(getMaximum(this.energyCapacityAvailable * 0.5, 650), flag.pos.roomName, true);
+                if(ret == OK)
+                {
+                    Memory.rooms[flag.pos.roomName].colonizing = true;
+                    console.log('Spawning claimer to colonize room ' + flag.pos.roomName);
+                }
+                else if(ret != ERR_NOT_ENOUGH_ENERGY) { console.log('Error spawning claimer: ' + ret); }
+                return true;
+            }
+            if(flag.room && flag.room.controller && flag.room.controller.my)
+            {
+                if(flag.room.memory.creeps.longBuilders < 3)
+                {
+                    let ret = spawn.createLongDistanceBuilder(getMaximum(this.energyCapacityAvailable * 0.7, 900), flag.room.name);
+                    if(ret == OK)
+                    {
+                        flag.room.memory.creeps.longBuilders++;
+                        console.log('Spawning builder to colonize room ' + flag.room.name);
+                    }
+                    else if(ret != ERR_NOT_ENOUGH_ENERGY) { console.log('Error spawning long distance builder: ' + ret); }
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+
+
+
+
+
+
 
 
 
